@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog | Mineverse</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/tw-config.js"></script>
+    <link rel="stylesheet" href="css/site.css">
+</head>
+<body class="bg-cosmic text-white relative" data-page="blog">
+    <canvas id="starfield"></canvas>
+    <div id="site-header"></div>
+
+    <main class="relative z-10 pt-24 sm:pt-32">
+        <section class="py-6 sm:py-10 px-5 sm:px-6 lg:px-16 max-w-7xl mx-auto reveal-up">
+            <div class="flex items-start gap-4 sm:gap-5 mb-8 sm:mb-10">
+                <div class="w-1.5 bg-mineblue rounded-none self-stretch flex-shrink-0"></div>
+                <div class="flex-grow">
+                    <div class="flex items-center gap-4 mb-3">
+                        <span class="text-xs font-bold text-mineblue tracking-widest uppercase">MINEVERSE BLOG</span>
+                        <div class="flex-grow h-[1px] bg-cardborder"></div>
+                        <span id="post-count" class="text-xs font-medium text-gray-400 uppercase tracking-widest"></span>
+                    </div>
+                    <h1 class="font-extrabold text-3xl sm:text-5xl tracking-tight uppercase">Blog & Artikel</h1>
+                    <p class="text-gray-400 text-sm font-medium leading-relaxed mt-4 max-w-2xl">Kabar terbaru, pengumuman, dan cerita dari seluruh ekosistem Mineverse.</p>
+                </div>
+            </div>
+
+            <!-- Search + filter kategori -->
+            <div class="flex flex-col md:flex-row gap-4 md:items-center md:justify-between mb-10">
+                <div id="filters" class="flex flex-wrap gap-2"></div>
+                <div class="relative w-full md:w-72">
+                    <svg class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z"/></svg>
+                    <input id="search" type="search" placeholder="Cari artikel..." class="w-full bg-cardbg border border-cardborder rounded-lg pl-9 pr-4 py-2.5 text-sm font-medium text-white placeholder-gray-500 outline-none focus:border-mineblue transition-colors">
+                </div>
+            </div>
+
+            <div id="grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            <p id="empty" class="hidden text-center text-gray-400 text-sm font-medium py-16">Tidak ada artikel yang cocok.</p>
+
+            <div class="text-center mt-10">
+                <button id="more" class="hidden px-6 py-3 rounded-lg bg-cardbg border border-cardborder text-xs font-bold text-mineblue hover:bg-mineblue hover:text-black hover:border-mineblue transition-all uppercase tracking-wider shine-effect">Muat Lebih Banyak ↓</button>
+            </div>
+        </section>
+    </main>
+
+    <div id="site-footer"></div>
+
+    <script src="js/data.js"></script>
+    <script src="js/layout.js"></script>
+    <script>
+        const PER_PAGE = 6;
+        const posts = [...BLOG_POSTS].sort((a, b) => b.date.localeCompare(a.date));
+        let cat = 'Semua', q = '', shown = PER_PAGE;
+
+        const fmt = d => new Date(d + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
+        const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+        function card(p, i) {
+            return `
+            <a href="post.html?p=${encodeURIComponent(p.slug)}" class="reveal-up bg-cardbg border border-cardborder rounded-lg p-5 sm:p-6 card-hover-lift group flex flex-col justify-between shadow-xl" style="transition-delay:${(i % 3) * 80}ms">
+                <div>
+                    <div class="h-44 bg-cosmic border border-cardborder rounded-md mb-4 overflow-hidden relative flex items-center justify-center">
+                        ${p.image ? `<img src="${esc(p.image)}" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">` : `<span class="text-xs text-gray-600 font-bold uppercase">${esc(p.category)} Banner</span>`}
+                    </div>
+                    <div class="flex items-center gap-2 text-xs font-bold mb-3 uppercase tracking-wider">
+                        <span class="text-gray-400">${fmt(p.date)}</span>
+                        <span class="text-mineblue font-extrabold">${esc(p.category)}</span>
+                    </div>
+                    <h3 class="font-bold text-lg mb-3 group-hover:text-mineblue transition-colors leading-snug">${esc(p.title)}</h3>
+                    <p class="text-gray-400 text-xs font-medium leading-relaxed mb-6">${esc(p.excerpt)}</p>
+                </div>
+                <div class="pt-4 border-t border-cardborder flex items-center justify-between text-xs text-gray-500 font-medium">
+                    <span>Ditulis oleh ${esc(p.author)}</span>
+                    <span class="text-mineblue font-bold group-hover:translate-x-1 transition-transform">Baca ↗</span>
+                </div>
+            </a>`;
+        }
+
+        function filtered() {
+            const k = q.trim().toLowerCase();
+            return posts.filter(p => (cat === 'Semua' || p.category === cat) &&
+                (!k || (p.title + ' ' + p.excerpt + ' ' + p.category).toLowerCase().includes(k)));
+        }
+
+        function render() {
+            const list = filtered();
+            document.getElementById('grid').innerHTML = list.slice(0, shown).map(card).join('');
+            document.getElementById('empty').classList.toggle('hidden', list.length > 0);
+            document.getElementById('more').classList.toggle('hidden', list.length <= shown);
+            document.getElementById('post-count').textContent = list.length + ' ARTIKEL';
+            window.mvReveal();
+        }
+
+        function renderFilters() {
+            const cats = ['Semua', ...new Set([...(window.BLOG_CATEGORIES || []), ...posts.map(p => p.category)])];
+            document.getElementById('filters').innerHTML = cats.map(c => `
+                <button data-c="${esc(c)}" class="px-3.5 py-2 sm:px-4 rounded-lg font-bold text-xs uppercase transition-all ${c === cat
+                    ? 'bg-mineblue text-black shadow-md'
+                    : 'bg-cardbg border border-cardborder text-gray-400 hover:border-mineblue hover:text-mineblue'}">${esc(c)}</button>`).join('');
+            document.querySelectorAll('#filters button').forEach(b => b.onclick = () => { cat = b.dataset.c; shown = PER_PAGE; renderFilters(); render(); });
+        }
+
+        document.getElementById('search').addEventListener('input', e => { q = e.target.value; shown = PER_PAGE; render(); });
+        document.getElementById('more').onclick = () => { shown += PER_PAGE; render(); };
+        renderFilters(); render();
+    </script>
+</body>
+</html>

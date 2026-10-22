@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mineverse Store | Branch</title>
+    
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cosmic: '#0b0b0d',
+                        cardbg: 'rgba(18, 18, 22, 0.80)',
+                        cardborder: '#22222c',
+                        mineblue: '#40c4ff',
+                        minegreen: '#2cd158',
+                        minegreensoft: 'rgba(44, 209, 88, 0.15)',
+                        mineyellow: '#ffa100',
+                        minegreen: '#2cd158',
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0b0b0d;
+            color: #ffffff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .glass-nav {
+            background: rgba(11, 11, 13, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid #22222c;
+        }
+
+        .bg-cardbg {
+            background-color: rgba(18, 18, 22, 0.80);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        /* CARD HOVER TANPA GLOW */
+        .card-hover-lift {
+            transition: transform 0.45s cubic-bezier(0.15, 0.85, 0.2, 1), border-color 0.3s ease;
+        }
+        .card-hover-lift:hover {
+            transform: translateY(-6px);
+            border-color: #2cd158;
+        }
+
+        .shine-effect {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shine-effect::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 30%;
+            height: 200%;
+            background: linear-gradient(
+                to right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.6) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: rotate(25deg);
+        }
+
+        .shine-effect:hover::after {
+            animation: manual-shine 0.75s ease-in-out forwards;
+        }
+
+        @keyframes manual-shine {
+            0% { left: -60%; }
+            100% { left: 130%; }
+        }
+
+        @keyframes slowPulse {
+            0% { opacity: 0.4; }
+            50% { opacity: 1; transform: scale(1.1); }
+            100% { opacity: 0.4; }
+        }
+
+        .status-dot-pulse {
+            animation: slowPulse 2s infinite ease-in-out;
+        }
+
+        .reveal-up {
+            opacity: 0;
+            transform: translateY(35px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal-up.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ---- Menu HP (hamburger) ---- */
+        html { scroll-padding-top: 84px; }
+        #mv-burger span { display: block; width: 22px; height: 2px; background: #fff; border-radius: 2px; transition: transform .3s, opacity .3s; }
+        #mv-burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        #mv-burger.open span:nth-child(2) { opacity: 0; }
+        #mv-burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+        #mv-menu { max-height: 0; overflow: hidden; visibility: hidden; transition: max-height .35s ease, visibility .35s; }
+        #mv-menu.open { max-height: 320px; visibility: visible; }
+        @media (max-width: 640px) {
+            main section h2 { overflow-wrap: anywhere; }
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0b0b0d; }
+        ::-webkit-scrollbar-thumb { background: #22222c; border-radius: 4px; border: 1px solid #2cd158; }
+    </style>
+</head>
+<body class="bg-cosmic text-white relative">
+
+    <canvas id="starfield"></canvas>
+
+    <!-- NAVBAR -->
+    <header class="fixed top-0 left-0 w-full z-50 glass-nav px-5 sm:px-6 lg:px-16 py-3 sm:py-4 flex items-center justify-between transition-all duration-300">
+        <a href="index.html" class="flex items-center gap-3">
+            <img src="logo.png" alt="Mineverse Logo" class="w-9 h-9 sm:w-10 sm:h-10 object-contain">
+            <span class="font-extrabold text-lg sm:text-xl tracking-wider text-white">MINEVERSE</span>
+        </a>
+
+        <nav class="hidden md:flex items-center gap-8 font-semibold text-sm tracking-wide text-gray-300">
+            <a href="index.html#home" class="hover:text-minegreen transition-colors">Home</a>
+            <a href="blog.html" class="hover:text-minegreen transition-colors">Blog</a>
+            <a href="team.html" class="hover:text-minegreen transition-colors">Team</a>
+            <a href="multiverse.html" class="hover:text-minegreen transition-colors text-minegreen font-bold">Multiverse</a>
+        </nav>
+
+        <button id="mv-burger" type="button" aria-label="Menu" aria-expanded="false" aria-controls="mv-menu" class="md:hidden flex flex-col gap-[5px] p-2.5 -mr-2.5"><span></span><span></span><span></span></button>
+        <div id="mv-menu" class="md:hidden absolute top-full left-0 w-full glass-nav">
+            <a href="index.html#home" class="block px-6 py-3.5 text-sm font-semibold tracking-wide border-t border-cardborder text-gray-300 hover:text-minegreen transition-colors">Home</a>
+            <a href="blog.html" class="block px-6 py-3.5 text-sm font-semibold tracking-wide border-t border-cardborder text-gray-300 hover:text-minegreen transition-colors">Blog</a>
+            <a href="team.html" class="block px-6 py-3.5 text-sm font-semibold tracking-wide border-t border-cardborder text-gray-300 hover:text-minegreen transition-colors">Team</a>
+            <a href="multiverse.html" class="block px-6 py-3.5 text-sm font-semibold tracking-wide border-t border-cardborder text-minegreen">Multiverse</a>
+        </div>
+    </header>
+
+    <main class="relative z-10 pt-24 sm:pt-28">
+        <!-- HERO SECTION -->
+        <section class="px-5 sm:px-6 lg:px-16 max-w-7xl mx-auto pt-8 pb-10">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-cardbg border border-minegreen text-minegreen font-extrabold text-xs uppercase tracking-wider mb-6">
+                <svg class="w-4 h-4 text-minegreen" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                <span>OFFICIAL BRANCH</span>
+            </div>
+            <h1 class="font-black text-[2.1rem] sm:text-6xl lg:text-7xl uppercase tracking-tight leading-none mb-6 text-white max-w-4xl">
+                MINEVERSE <span class="text-minegreen">STORE</span>
+            </h1>
+            <p class="text-gray-400 text-base sm:text-lg max-w-3xl font-medium leading-relaxed mb-8">
+                Menyediakan berbagai jenis produk digital Minecraft. Di sini kamu bisa membeli skin minecraft, 3D render, hingga ilustrasi untuk karaktermu.
+            </p>
+            <div class="flex flex-wrap items-center gap-3">
+                <div class="px-4 py-2.5 rounded-lg bg-cardbg border border-cardborder flex items-center gap-2.5 text-xs font-bold text-gray-200">
+                    <span class="w-2.5 h-2.5 rounded-full bg-minegreen inline-block"></span>
+                    <span>Commission Open</span>
+                </div>
+                <div class="px-4 py-2.5 rounded-lg bg-cardbg border border-cardborder flex items-center gap-2.5 text-xs font-bold text-gray-200">
+                    <span class="w-2.5 h-2.5 rounded-full bg-mineblue inline-block"></span>
+                    <span>Kategori Produk: <strong class="text-white font-extrabold">4</strong></span>
+                </div>
+            </div>
+        </section>
+
+        <section id="catalogue" class="py-8 sm:py-12 px-5 sm:px-6 lg:px-16 max-w-7xl mx-auto reveal-up">
+            <div class="flex items-start gap-4 sm:gap-5 mb-8 sm:mb-10">
+                <div class="w-1.5 bg-minegreen rounded-none self-stretch flex-shrink-0"></div>
+                <div class="flex-grow">
+                    <div class="flex items-center gap-4 mb-3">
+                        <span class="text-xs font-bold text-minegreen tracking-widest uppercase">SECTOR 01</span>
+                        <div class="flex-grow h-[1px] bg-cardborder"></div>
+                        <span class="text-xs font-medium text-gray-400 uppercase tracking-widest">CATALOGUE</span>
+                    </div>
+                    <h2 class="font-extrabold text-3xl sm:text-5xl tracking-tight uppercase text-white">CREATIVE CATALOGUE</h2>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+                <div class="bg-cardbg border border-cardborder rounded-lg p-6 card-hover-lift flex flex-col shadow-xl group">
+                    <div class="h-40 rounded-md overflow-hidden border border-cardborder bg-cosmic mb-5">
+                        <img src="skin.png" alt="Minecraft Skin" onerror="this.style.display='none'" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                    <h3 class="font-extrabold text-lg text-white group-hover:text-minegreen transition-colors mb-4">Minecraft Skin</h3>
+                    <div class="space-y-2.5 mb-5">
+                            <div class="flex justify-between items-center text-xs gap-3">
+                                <span class="text-gray-300 font-semibold">Skin Standar</span>
+                                <span class="px-2 py-0.5 rounded-md bg-cosmic border border-cardborder text-white font-extrabold text-[11px] whitespace-nowrap">15.000</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs gap-3">
+                                <span class="text-gray-300 font-semibold">Couple Skin</span>
+                                <span class="px-2 py-0.5 rounded-md bg-cosmic border border-cardborder text-white font-extrabold text-[11px] whitespace-nowrap">25.000</span>
+                            </div>
+                    </div>
+                    <div class="text-[11px] font-extrabold text-minegreen uppercase tracking-wider pb-2 mb-3 border-b border-dashed border-cardborder">ADDONS</div>
+                    <div class="space-y-2.5">
+                            <div class="flex justify-between items-center text-xs gap-3">
+                                <span class="text-gray-300 font-semibold">Reshading Skin</span>
+                                <span class="px-2 py-0.5 rounded-md bg-cosmic border border-cardborder text-white font-extrabold text-[11px] whitespace-nowrap">8.000</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs gap-3">
+                                <span class="text-gray-300 font-semibold">New Outfit</span>
+                                <span class="px-2 py-0.5 rounded-md bg-cosmic border border-cardborder text-white font-extrabold text-[11px] whitespace-nowrap">10.000</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs gap-3">
+                                <span class="text-gray-300 font-semibold">Detail Rumit</span>
+                                <span class="px-2 py-0.5 rounded-md bg-cosmic border border-cardborder text-white font-extrabold text-[11px] whitespace-nowrap">5.000</span>
+                            </div>
+                    </div>
+                </div>
+                <div class="bg-cardbg border border-cardborder rounded-lg p-6 card-hover-lift flex flex-col shadow-xl group">
+                    <div class="h-40 rounded-md overflow-hidden border border-cardborder bg-cosmic mb-5">
+                        <img src="render1.png" alt="Minecraft Render" onerror="this.style.display='none'" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                    <h3 class="font-extrabold text-lg text-white group-hover:text-minegreen transition-colors mb-4">Minecraft Render</h3>
+                    <div class="space-y-2.5 mb-5">
+                            <div class="flex justify-between items-center text-xs gap-3">
+                                <span class="text-gray-300 font-semibold">Mineimator Render</span>
+                                <span class="px-2 py-0.5 rounded-md bg-cosmic border border-cardborder text-white font-extrabold text-[11px] whitespace-nowrap">10.000</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs gap-3">
+                                <span class="text-gray-300 font-semibold">Prisma3D Render</span>
+                                <span class="px-2 py-0.5 rounded-md bg-cosmic border border-cardborder text-white font-extrabold text-[11px] whitespace-nowrap">8.000</span>
+                            </div>
+                    </div>
+                    <div class="text-[11px] font-extrabold text-minegreen uppercase tracking-wider pb-2 mb-3 border-b border-dashed border-cardborder">ADDONS</div>
+                    <div class="space-y-2.5">
+                            <div class="flex justify-between items-center text-xs gap-3">
+                                <span class="text-gray-300 font-semibold">+2 Character</span>
+                                <span class="px-2 py-0.5 rounded-md bg-cosmic border border-cardborder text-white font-extrabold text-[11px] whitespace-nowrap">5.000</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs gap-3">
+                                <span class="text-gray-300 font-semibold">World Map Background</span>
+                                <span class="px-2 py-0.5 rounded-md bg-cosmic border border-cardborder text-white font-extrabold text-[11px] whitespace-nowrap">5.000</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs gap-3">
+                                <span class="text-gray-300 font-semibold">Model/Accessories</span>
+                                <span class="px-2 py-0.5 rounded-md bg-cosmic border border-cardborder text-white font-extrabold text-[11px] whitespace-nowrap">2.000</span>
+                            </div>
+                    </div>
+                </div>
+                <div class="bg-cardbg border border-cardborder rounded-lg p-6 card-hover-lift flex flex-col shadow-xl group">
+                    <div class="h-40 rounded-md overflow-hidden border border-cardborder bg-cosmic mb-5">
+                        <img src="render2.png" alt="Minecraft Art Render" onerror="this.style.display='none'" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                    <h3 class="font-extrabold text-lg text-white group-hover:text-minegreen transition-colors mb-4">Minecraft Art Render</h3>
+                    <div class="space-y-2.5 mb-5">
+                            <div class="flex justify-between items-center text-xs gap-3">
+                                <span class="text-gray-300 font-semibold">Wallpaper Render</span>
+                                <span class="px-2 py-0.5 rounded-md bg-cosmic border border-cardborder text-white font-extrabold text-[11px] whitespace-nowrap">25.000</span>
+                            </div>
+                    </div>
+                    <div class="text-[11px] font-extrabold text-minegreen uppercase tracking-wider pb-2 mb-3 border-b border-dashed border-cardborder">ADDONS</div>
+                    <div class="space-y-2.5">
+                            <div class="flex justify-between items-center text-xs gap-3">
+                                <span class="text-gray-300 font-semibold">+1 Character</span>
+                                <span class="px-2 py-0.5 rounded-md bg-cosmic border border-cardborder text-white font-extrabold text-[11px] whitespace-nowrap">5.000</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs gap-3">
+                                <span class="text-gray-300 font-semibold">Background Detail</span>
+                                <span class="px-2 py-0.5 rounded-md bg-cosmic border border-cardborder text-white font-extrabold text-[11px] whitespace-nowrap">10.000</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs gap-3">
+                                <span class="text-gray-300 font-semibold">World Map Background</span>
+                                <span class="px-2 py-0.5 rounded-md bg-cosmic border border-cardborder text-white font-extrabold text-[11px] whitespace-nowrap">10.000</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs gap-3">
+                                <span class="text-gray-300 font-semibold">Model/Accessories</span>
+                                <span class="px-2 py-0.5 rounded-md bg-cosmic border border-cardborder text-white font-extrabold text-[11px] whitespace-nowrap">5.000</span>
+                            </div>
+                    </div>
+                </div>
+                <div class="bg-cardbg border border-cardborder rounded-lg p-6 card-hover-lift flex flex-col shadow-xl group">
+                    <div class="h-40 rounded-md overflow-hidden border border-cardborder bg-cosmic mb-5">
+                        <img src="ilustrasi.png" alt="Ilustrasi/Gambar" onerror="this.style.display='none'" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                    <h3 class="font-extrabold text-lg text-white group-hover:text-minegreen transition-colors mb-4">Ilustrasi/Gambar</h3>
+                    <div class="space-y-2.5 mb-5">
+                            <div class="flex justify-between items-center text-xs gap-3">
+                                <span class="text-gray-300 font-semibold">Headshot</span>
+                                <span class="px-2 py-0.5 rounded-md bg-cosmic border border-cardborder text-white font-extrabold text-[11px] whitespace-nowrap">30.000</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs gap-3">
+                                <span class="text-gray-300 font-semibold">Bust Up</span>
+                                <span class="px-2 py-0.5 rounded-md bg-cosmic border border-cardborder text-white font-extrabold text-[11px] whitespace-nowrap">45.000</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs gap-3">
+                                <span class="text-gray-300 font-semibold">Half Body</span>
+                                <span class="px-2 py-0.5 rounded-md bg-cosmic border border-cardborder text-white font-extrabold text-[11px] whitespace-nowrap">50.000</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs gap-3">
+                                <span class="text-gray-300 font-semibold">Knee Up</span>
+                                <span class="px-2 py-0.5 rounded-md bg-cosmic border border-cardborder text-white font-extrabold text-[11px] whitespace-nowrap">150.000</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs gap-3">
+                                <span class="text-gray-300 font-semibold">Full Body</span>
+                                <span class="px-2 py-0.5 rounded-md bg-cosmic border border-cardborder text-white font-extrabold text-[11px] whitespace-nowrap">180.000</span>
+                            </div>
+                    </div>
+                    <div class="text-[11px] font-extrabold text-minegreen uppercase tracking-wider pb-2 mb-3 border-b border-dashed border-cardborder">ADDONS</div>
+                    <div class="space-y-2.5">
+                            <div class="flex justify-between items-center text-xs gap-3">
+                                <span class="text-gray-300 font-semibold">Background Detail</span>
+                                <span class="px-2 py-0.5 rounded-md bg-cosmic border border-cardborder text-white font-extrabold text-[11px] whitespace-nowrap">30.000</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs gap-3">
+                                <span class="text-gray-300 font-semibold">Extra Karakter</span>
+                                <span class="px-2 py-0.5 rounded-md bg-cosmic border border-cardborder text-white font-extrabold text-[11px] whitespace-nowrap">70% Harga</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs gap-3">
+                                <span class="text-gray-300 font-semibold">Detail/Pose Kompleks</span>
+                                <span class="px-2 py-0.5 rounded-md bg-cosmic border border-cardborder text-white font-extrabold text-[11px] whitespace-nowrap">10.000</span>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="order" class="py-8 sm:py-12 px-5 sm:px-6 lg:px-16 max-w-7xl mx-auto reveal-up">
+            <div class="flex items-start gap-4 sm:gap-5 mb-8 sm:mb-10">
+                <div class="w-1.5 bg-minegreen rounded-none self-stretch flex-shrink-0"></div>
+                <div class="flex-grow">
+                    <div class="flex items-center gap-4 mb-3">
+                        <span class="text-xs font-bold text-minegreen tracking-widest uppercase">SECTOR 02</span>
+                        <div class="flex-grow h-[1px] bg-cardborder"></div>
+                        <span class="text-xs font-medium text-gray-400 uppercase tracking-widest">ORDER</span>
+                    </div>
+                    <h2 class="font-extrabold text-3xl sm:text-5xl tracking-tight uppercase text-white">PEMESANAN</h2>
+                </div>
+            </div>
+            <div class="bg-cardbg border border-cardborder rounded-lg p-6 sm:p-10 card-hover-lift shadow-xl flex flex-col lg:flex-row gap-8 lg:gap-12 items-stretch">
+                <div class="flex-[1.3]">
+                    <div class="inline-block px-3 py-1 rounded-lg border border-minegreen text-minegreen font-extrabold text-[11px] uppercase tracking-wider mb-4">Pemesanan Instan</div>
+                    <h3 class="font-extrabold text-3xl sm:text-4xl leading-tight mb-4">Tertarik untuk <span class="text-minegreen">Membeli?</span></h3>
+                    <p class="text-gray-400 text-sm font-medium leading-relaxed mb-6">Order skin, 3D render, atau art kustomisasi kamu langsung melalui Discord Mineverse. Tim kami siap melayani request sesuai keinginanmu!</p>
+                    <div class="flex flex-wrap gap-2.5">
+                        <span class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-cosmic border border-cardborder text-minegreen text-xs font-bold"><svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Proses pengerjaan cepat</span>
+                        <span class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-cosmic border border-cardborder text-minegreen text-xs font-bold"><svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Kualitas terbaik</span>
+                    </div>
+                </div>
+                <div class="flex-1 rounded-lg border border-dashed border-cardborder bg-cosmic/60 p-6 sm:p-8 flex flex-col items-center justify-center text-center">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-minegreen/10 border border-minegreen/30 text-minegreen text-[11px] font-extrabold uppercase mb-4">
+                        <span class="w-2 h-2 rounded-full bg-minegreen status-dot-pulse"></span>Commission Open
+                    </div>
+                    <p class="text-gray-400 text-xs font-semibold leading-relaxed mb-6">Hubungi kami via Ticket Discord untuk konsultasi &amp; order</p>
+                    <a href="https://discord.gg/m8FVYTqZN" target="_blank" class="w-full inline-flex items-center justify-center gap-3 px-6 py-3.5 rounded-lg bg-minegreen text-black font-extrabold text-sm hover:scale-[1.02] transition-transform shine-effect"><svg class="w-5 h-5 fill-current" viewBox="0 0 127.14 96.36"><path d="M107.7,8.07A105.15,105.15,0,0,0,77.26,0a77.19,77.19,0,0,0-3.3,6.83A96.67,96.67,0,0,0,53.22,6.83,77.19,77.19,0,0,0,49.88,0,105.15,105.15,0,0,0,19.44,8.07C3.66,31.58-1.86,54.65,1,77.53A105.73,105.73,0,0,0,32,96.36a77.7,77.7,0,0,0,6.63-10.85,68.43,68.43,0,0,1-10.45-5c.89-.65,1.75-1.34,2.58-2a75.59,75.59,0,0,0,72.6,0c.83.71,1.69,1.4,2.58,2a68.43,68.43,0,0,1-10.45,5,77.7,77.7,0,0,0,6.63,10.85,105.73,105.73,0,0,0,31-18.83C129.87,48.12,123.3,25.26,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53S36.18,40.36,42.45,40.36,53.83,46,53.83,53,48.72,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.24,60,73.24,53S78.41,40.36,84.69,40.36,96.07,46,96.07,53,91,65.69,84.69,65.69Z"/></svg><span>Pesan Lewat Discord</span></a>
+                </div>
+            </div>
+        </section>
+
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-cardborder bg-cardbg pt-12 sm:pt-16 pb-10 sm:pb-12 px-5 sm:px-6 lg:px-16 relative z-10 mt-12">
+        <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-5 gap-8 mb-10 sm:mb-16">
+            <div class="col-span-2 md:col-span-2">
+                <a href="index.html" class="flex items-center gap-3 mb-4">
+                    <img src="logo.png" alt="Mineverse Logo" class="w-8 h-8 object-contain">
+                    <span class="font-bold text-lg tracking-wider text-white">Mineverse</span>
+                </a>
+                <p class="text-xs text-gray-400 leading-relaxed font-medium pr-6">
+                    A next-generation digital Minecraft ecosystem infrastructure designed specifically for creative people who need a platform to create.
+                </p>
+            </div>
+            <div class="md:col-span-1">
+                <h4 class="font-bold text-xs uppercase tracking-wider text-white mb-4">SOCIAL MEDIA</h4>
+                <ul class="space-y-2 text-xs font-medium text-gray-400">
+                    <li><a href="https://www.youtube.com/@Mineverse.c" target="_blank" class="hover:text-minegreen transition-colors">YouTube</a></li>
+                    <li><a href="https://www.instagram.com/mineverse_official/" target="_blank" class="hover:text-minegreen transition-colors">Instagram</a></li>
+                    <li><a href="https://discord.gg/m8FVYTqZN" target="_blank" class="hover:text-minegreen transition-colors">Discord</a></li>
+                </ul>
+            </div>
+            <div class="md:col-span-1">
+                <h4 class="font-bold text-xs uppercase tracking-wider text-white mb-4">DOCUMENT</h4>
+                <ul class="space-y-2 text-xs font-medium text-gray-400">
+                    <li><a href="#" class="hover:text-minegreen transition-colors">Branding</a></li>
+                    <li><a href="index.html#about-sector" class="hover:text-minegreen transition-colors">Milestone</a></li>
+                    <li><a href="mailto:mineversepersonal@gmail.com" class="hover:text-minegreen transition-colors">Email</a></li>
+                </ul>
+            </div>
+            <div class="md:col-span-1">
+                <h4 class="font-bold text-xs uppercase tracking-wider text-white mb-4">SUPPORT</h4>
+                <ul class="space-y-2 text-xs font-medium text-gray-400">
+                    <li><a href="https://saweria.co/mineverseid" target="_blank" class="hover:text-minegreen transition-colors">Saweria</a></li>
+                    <li><a href="index.html#about-sector" class="hover:text-minegreen transition-colors">Partnership</a></li>
+                    <li><a href="index.html#about-sector" class="hover:text-minegreen transition-colors">Proposal</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto pt-8 border-t border-cardborder flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-gray-500 font-medium">
+            <div>&copy; 2026 Mineverse Portal. All Rights Reserved.</div>
+            <div class="flex items-center gap-2 text-gray-400">
+                <span class="w-2 h-2 rounded-full bg-minegreen inline-block"></span>
+                <span>Alzena - Owner &amp; Founder Mineverse</span>
+                <span class="w-2 h-2 rounded-full bg-minegreen inline-block"></span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- BACKGROUND ANIMATED STARFIELD -->
+    <script>
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+
+        let stars = [];
+        const numStars = 140;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        for (let i = 0; i < numStars; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 1.2 + 0.3,
+                alpha: Math.random() * 0.6 + 0.2,
+                vx: (Math.random() - 0.5) * 0.3,
+                vy: (Math.random() - 0.5) * 0.3
+            });
+        }
+
+        function animateStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#ffffff';
+
+            stars.forEach(star => {
+                star.x += star.vx;
+                star.y += star.vy;
+
+                if (star.x < 0) star.x = canvas.width;
+                if (star.x > canvas.width) star.x = 0;
+                if (star.y < 0) star.y = canvas.height;
+                if (star.y > canvas.height) star.y = 0;
+
+                ctx.globalAlpha = star.alpha;
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            requestAnimationFrame(animateStars);
+        }
+        animateStars();
+
+        (function () {
+            const bt = document.getElementById('mv-burger'), mn = document.getElementById('mv-menu');
+            const set = o => { bt.classList.toggle('open', o); mn.classList.toggle('open', o); bt.setAttribute('aria-expanded', o); };
+            bt.onclick = e => { e.stopPropagation(); set(!mn.classList.contains('open')); };
+            mn.querySelectorAll('a').forEach(a => a.addEventListener('click', () => set(false)));
+            document.addEventListener('click', e => { if (!mn.contains(e.target)) set(false); });
+            addEventListener('keydown', e => { if (e.key === 'Escape') set(false); });
+            addEventListener('resize', () => { if (innerWidth >= 768) set(false); });
+        })();
+
+        const revealElements = document.querySelectorAll('.reveal-up');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        revealElements.forEach(el => observer.observe(el));
+    </script>
+</body>
+</html>

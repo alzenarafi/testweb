@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiverse Graph | Mineverse Portal</title>
+    
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cosmic: '#0b0b0d',
+                        cardbg: 'rgba(18, 18, 22, 0.85)',
+                        cardborder: '#22222c',
+                        mineblue: '#40c4ff',
+                        minered: '#b3122a',
+                        mineyellow: '#ffa100',
+                        minegreen: '#2cd158',
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- D3.js Library -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <style>
+        body {
+            background-color: #0b0b0d;
+            color: #ffffff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .bg-cardbg {
+            background-color: rgba(18, 18, 22, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        /* Shine Effect Persis Index.html */
+        .shine-effect {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shine-effect::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 30%;
+            height: 200%;
+            background: linear-gradient(
+                to right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.6) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: rotate(25deg);
+        }
+
+        .shine-effect:hover::after {
+            animation: manual-shine 0.75s ease-in-out forwards;
+        }
+
+        @keyframes manual-shine {
+            0% { left: -60%; }
+            100% { left: 130%; }
+        }
+
+        /* Graph Nodes Hover Animasi & Glow */
+        .node circle {
+            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), filter 0.3s ease, stroke-width 0.3s ease;
+        }
+
+        .node:hover circle {
+            stroke-width: 3.5px;
+            transform: scale(1.08);
+        }
+
+        #universe-drawer {
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0b0b0d; }
+        ::-webkit-scrollbar-thumb { background: #22222c; border-radius: 4px; border: 1px solid #40c4ff; }
+    </style>
+</head>
+<body class="w-screen h-screen bg-cosmic text-white relative">
+
+    <canvas id="starfield"></canvas>
+
+    <!-- TOP HEADER: SECTOR BAR BIRU & TOMBOL KEMBALI DI KANAN SEJAJAR JUDUL -->
+    <div class="fixed top-4 sm:top-6 left-5 sm:left-6 right-5 sm:right-6 z-30 pointer-events-none">
+        <div class="flex items-start gap-4">
+            <!-- Blue Bar Vertikal Khas Index.html -->
+            <div class="w-1.5 bg-mineblue rounded-none self-stretch flex-shrink-0"></div>
+            
+            <div class="flex-grow">
+                <!-- Top Line dengan SECTOR 01 (Biru) & Garis -->
+                <div class="flex items-center gap-4 mb-1">
+                    <span class="text-xs font-bold text-mineblue tracking-widest uppercase">SECTOR 01</span>
+                    <div class="flex-grow h-[1px] bg-cardborder/80"></div>
+                </div>
+
+                <h1 class="font-extrabold text-xl sm:text-4xl tracking-tight uppercase text-white">DATA MULTISEMESTA</h1>
+
+                <!-- 3 Card Ringkas Stats di Bawah Judul -->
+                <div class="flex flex-wrap items-center gap-2 sm:gap-3 mt-3 sm:mt-4 pointer-events-auto">
+                    <div class="px-3.5 py-1.5 rounded-lg bg-cardbg border border-cardborder text-xs font-bold flex items-center gap-2 shadow-lg">
+                        <span class="w-2.5 h-2.5 rounded-full bg-mineblue shadow-[0_0_6px_#40c4ff]"></span>
+                        <span class="text-white">Existing Universe: 2</span>
+                    </div>
+
+                    <div class="px-3.5 py-1.5 rounded-lg bg-cardbg border border-cardborder text-xs font-bold flex items-center gap-2 shadow-lg">
+                        <span class="w-2.5 h-2.5 rounded-full bg-minered shadow-[0_0_6px_#b3122a]"></span>
+                        <span class="text-white">Extinct Universe: 0</span>
+                    </div>
+
+                    <div class="px-3.5 py-1.5 rounded-lg bg-cardbg border border-cardborder text-xs font-bold flex items-center gap-2 shadow-lg">
+                        <span class="w-2.5 h-2.5 rounded-full bg-gray-400"></span>
+                        <span class="text-white">Total Universe: 2</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOMBOL KEMBALI KE PORTAL: kiri bawah (HP & desktop) -->
+    <div class="fixed left-5 sm:left-6 bottom-[max(1.25rem,env(safe-area-inset-bottom))] sm:bottom-6 z-30">
+        <a href="index.html" class="px-4 py-2.5 rounded-lg bg-cardbg border border-cardborder text-xs font-bold text-mineblue hover:bg-mineblue hover:text-black hover:border-mineblue transition-all uppercase tracking-wider inline-flex items-center gap-2 shine-effect shadow-lg">
+            <span>←</span><span class="sm:hidden">Portal</span><span class="hidden sm:inline">Kembali ke Portal</span>
+        </a>
+    </div>
+
+    <!-- GRAPH VIEW AREA -->
+    <svg id="multiverse-graph" class="w-full h-full absolute top-0 left-0 z-10 cursor-grab active:cursor-grabbing"></svg>
+
+    <!-- RIGHT PANEL / DRAWER SIDEBAR -->
+    <aside id="universe-drawer" class="fixed bottom-0 left-0 w-full max-h-[72vh] rounded-t-2xl border-t border-cardborder sm:top-0 sm:right-0 sm:left-auto sm:bottom-auto sm:h-full sm:max-h-none sm:w-96 sm:rounded-none sm:border-t-0 sm:border-l z-40 bg-cosmic/95 backdrop-blur shadow-2xl px-6 pt-4 pb-6 sm:p-8 transform translate-y-full sm:translate-y-0 sm:translate-x-full flex flex-col justify-between overflow-y-auto overscroll-contain">
+        <div>
+            <div class="sm:hidden w-10 h-1 rounded-full bg-cardborder mx-auto mb-4"></div>
+            <!-- Header Panel: Icon Bumi Vector + Label Code Semesta & Nama Semesta -->
+            <div class="flex items-start gap-4 mb-5 pt-2">
+                <div id="drawer-icon-box" class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 border">
+                    <svg id="drawer-icon-svg" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 002 2h1.5a2.5 2.5 0 002.5-2.5V7a2 2 0 00-2-2h-1c-.601 0-1.037-.417-1.127-.992a5.002 5.002 0 00-9.818 0A1.99 1.99 0 018 3.935zM21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div>
+                    <!-- Label ID Semesta (e.g., SEMESTA 1947) -->
+                    <span id="drawer-semesta-label" class="text-xs font-semibold uppercase tracking-wider block mb-0.5">SEMESTA 0000</span>
+                    <!-- Nama Semesta (e.g., Odyssey) -->
+                    <h2 id="drawer-title" class="font-extrabold text-2xl text-white tracking-tight leading-tight uppercase">NAME</h2>
+                </div>
+            </div>
+
+            <!-- Deskripsi Panjang Universe -->
+            <p id="drawer-desc" class="text-xs text-gray-400 font-normal leading-relaxed mb-6">
+                Deskripsi semesta akan ditampilkan di sini.
+            </p>
+
+            <!-- Anchor Being: Label Teks Putih, Nama Abu-abu -->
+            <div class="mb-6">
+                <span class="text-xs font-extrabold text-white uppercase tracking-wider block mb-1">ANCHOR BEING</span>
+                <span id="drawer-anchor-name" class="text-xs font-medium text-gray-400 block">-</span>
+            </div>
+
+            <!-- Garis Pemisah (Divider) -->
+            <div class="h-[1px] bg-cardborder/80 w-full my-6"></div>
+
+            <!-- List Detail (Icon Diamond + Label Abu-abu & Isi Warna Spesifik) -->
+            <div class="space-y-3.5">
+                <!-- 1. Status -->
+                <div class="flex items-center gap-3 text-xs">
+                    <svg id="diamond-icon-1" class="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="4" y="4" width="16" height="16" rx="2" transform="rotate(45 12 12)"/></svg>
+                    <span class="text-gray-400 font-medium">Status:</span>
+                    <span id="drawer-status-val" class="font-extrabold tracking-wide">-</span>
+                </div>
+
+                <!-- 2. Populasi -->
+                <div class="flex items-center gap-3 text-xs">
+                    <svg id="diamond-icon-2" class="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="4" y="4" width="16" height="16" rx="2" transform="rotate(45 12 12)"/></svg>
+                    <span class="text-gray-400 font-medium">Populasi:</span>
+                    <span id="drawer-populasi-val" class="text-white font-bold tracking-wide">-</span>
+                </div>
+
+                <!-- 3. Diciptakan -->
+                <div class="flex items-center gap-3 text-xs">
+                    <svg id="diamond-icon-3" class="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="4" y="4" width="16" height="16" rx="2" transform="rotate(45 12 12)"/></svg>
+                    <span class="text-gray-400 font-medium">Diciptakan:</span>
+                    <span id="drawer-diciptakan-val" class="text-white font-bold tracking-wide">-</span>
+                </div>
+
+                <!-- 4. Dihancurkan -->
+                <div class="flex items-center gap-3 text-xs">
+                    <svg id="diamond-icon-4" class="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="4" y="4" width="16" height="16" rx="2" transform="rotate(45 12 12)"/></svg>
+                    <span class="text-gray-400 font-medium">Dihancurkan:</span>
+                    <span id="drawer-dihancurkan-val" class="text-white font-bold tracking-wide">-</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTTOM FOOTER PANEL: Tombol Kembali Bergaya 'Portal' di Kiri & MV DB di Kanan -->
+        <div class="pt-5 sm:pt-6 border-t border-cardborder/80 mt-6 sm:mt-8 flex items-center justify-between">
+            <button onclick="closeDrawer()" class="px-4 py-2 rounded-lg bg-cardbg border border-cardborder text-xs font-bold text-mineblue hover:bg-mineblue hover:text-black hover:border-mineblue transition-all uppercase tracking-wider inline-flex items-center gap-2 shine-effect">
+                ← Kembali
+            </button>
+            <span class="text-xs font-extrabold text-gray-500 tracking-widest uppercase">MULTIVERSE DATABASE</span>
+        </div>
+    </aside>
+
+    <script>
+        /* 1. STARFIELD ANIMATION */
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+        const numStars = 140;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        for (let i = 0; i < numStars; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 1.2 + 0.3,
+                alpha: Math.random() * 0.6 + 0.2,
+                vx: (Math.random() - 0.5) * 0.3,
+                vy: (Math.random() - 0.5) * 0.3
+            });
+        }
+
+        function animateStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#ffffff';
+            stars.forEach(star => {
+                star.x += star.vx;
+                star.y += star.vy;
+                if (star.x < 0) star.x = canvas.width;
+                if (star.x > canvas.width) star.x = 0;
+                if (star.y < 0) star.y = canvas.height;
+                if (star.y > canvas.height) star.y = 0;
+
+                ctx.globalAlpha = star.alpha;
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            requestAnimationFrame(animateStars);
+        }
+        animateStars();
+
+        /* 2. D3.JS GRAPH VIEW CONFIGURATION (Database ID & Name Dipisah) */
+        const universeNodes = [
+            {
+                id: "SEMESTA 8109",
+                name: "The Odyssey",
+                status: "Existing Universe",
+                color: "#40c4ff", // Mineblue (Biru)
+                glowId: "glow-blue",
+                radius: 42,
+                anchorBeing: "Alzena",
+                populasi: "800 Juta",
+                diciptakan: "8 Oktober 2026",
+                dihancurkan: "-",
+                desc: "Semesta aktif utama yang menaungi seluruh cabang ekosistem kreatif Mineverse saat ini. Memiliki tingkat stabilitas waktu serta konektivitas yang sangat tinggi bagi pengembangan proyek."
+            },
+            //{
+                //id: "SEMESTA 1947",
+                //name: "Brutal Legacy",
+                //status: "Extinct Universe",
+                //color: "#b3122a", // Minered (Merah)
+                //glowId: "glow-red",
+                //radius: 38,
+                //anchorBeing: "Brutal Core",
+                //populasi: "Terarsip (0)",
+                //diciptakan: "15 Desember 2023",
+                //dihancurkan: "14 April 2024",
+                //desc: "Semesta era awal yang kini telah diarsip (Extinct). Berfungsi sebagai fondasi historis utama terbentuknya jaringan Brutal Community sebelum restrukturisasi besar."
+            //},
+            {
+                id: "SEMESTA 52218",
+                name: "5W+1H",
+                status: "Existing Universe",
+                color: "#40c4ff",
+                glowId: "glow-blue",
+                radius: 42,
+                anchorBeing: "Unidentified",
+                populasi: "7,9 Miliar",
+                diciptakan: "8 Januari 2026",
+                dihancurkan: "-",
+                desc: "Semesta eksplorasi baru yang sedang dikembangkan untuk proyek jangka panjang ekosistem multisemesta Mineverse."
+            }
+        ];
+
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        const svg = d3.select("#multiverse-graph")
+            .attr("width", width)
+            .attr("height", height);
+
+        // SVG Filters untuk Efek Glow Lingkaran
+        const defs = svg.append("defs");
+
+        // Glow Filter Biru Default
+        const glowBlue = defs.append("filter")
+            .attr("id", "glow-blue")
+            .attr("x", "-50%")
+            .attr("y", "-50%")
+            .attr("width", "200%")
+            .attr("height", "200%");
+        glowBlue.append("feGaussianBlur").attr("stdDeviation", "4").attr("result", "coloredBlur");
+        const feMergeBlue = glowBlue.append("feMerge");
+        feMergeBlue.append("feMergeNode").attr("in", "coloredBlur");
+        feMergeBlue.append("feMergeNode").attr("in", "SourceGraphic");
+
+        // Glow Filter Merah Default
+        const glowRed = defs.append("filter")
+            .attr("id", "glow-red")
+            .attr("x", "-50%")
+            .attr("y", "-50%")
+            .attr("width", "200%")
+            .attr("height", "200%");
+        glowRed.append("feGaussianBlur").attr("stdDeviation", "4").attr("result", "coloredBlur");
+        const feMergeRed = glowRed.append("feMerge");
+        feMergeRed.append("feMergeNode").attr("in", "coloredBlur");
+        feMergeRed.append("feMergeNode").attr("in", "SourceGraphic");
+
+        const container = svg.append("g");
+
+        // Zoom/Pan
+        svg.call(d3.zoom()
+            .scaleExtent([0.3, 4])
+            .on("zoom", (event) => {
+                container.attr("transform", event.transform);
+            }));
+
+        // Force Simulation
+        const simulation = d3.forceSimulation(universeNodes)
+            .force("charge", d3.forceManyBody().strength(-500))
+            .force("center", d3.forceCenter(width / 2, height / 2 + 40))
+            .force("collide", d3.forceCollide().radius(d => d.radius + (width < 640 ? 45 : 90)));
+
+        // Render Group Node
+        const node = container.append("g")
+            .selectAll(".node")
+            .data(universeNodes)
+            .join("g")
+            .attr("class", "node")
+            .call(drag(simulation))
+            .on("click", (event, d) => {
+                event.stopPropagation();
+                openDrawer(d);
+            });
+
+        // 1. Pill Badge Card di Atas Bola (Menampilkan ID Semesta)
+        const badgeGroup = node.append("g")
+            .attr("transform", d => `translate(0, -${d.radius + 28})`);
+
+        badgeGroup.append("rect")
+            .attr("x", -65)
+            .attr("y", -13)
+            .attr("width", 130)
+            .attr("height", 26)
+            .attr("rx", 13)
+            .attr("fill", "rgba(11, 11, 13, 0.95)")
+            .attr("stroke", d => d.color)
+            .attr("stroke-width", "1.5px");
+
+        badgeGroup.append("text")
+            .attr("text-anchor", "middle")
+            .attr("dy", "4px")
+            .attr("fill", d => d.color)
+            .attr("font-size", "10px")
+            .attr("font-weight", "800")
+            .attr("letter-spacing", "0.08em")
+            .text(d => d.id.toUpperCase());
+
+        // 2. Bola/Lingkaran dengan Glow Sesuai Warna Masing-masing
+        node.append("circle")
+            .attr("r", d => d.radius)
+            .attr("fill", d => d.color)
+            .attr("stroke", d => d.color)
+            .attr("stroke-opacity", 0.5)
+            .attr("stroke-width", "3px")
+            .style("filter", d => `url(#${d.glowId})`)
+            .on("mouseover", function(event, d) {
+                d3.select(this)
+                  .style("filter", `drop-shadow(0 0 18px ${d.color})`)
+                  .attr("stroke-opacity", 1);
+            })
+            .on("mouseout", function(event, d) {
+                d3.select(this)
+                  .style("filter", `url(#${d.glowId})`)
+                  .attr("stroke-opacity", 0.5);
+            });
+
+        // Tick Position Update
+        simulation.on("tick", () => {
+            node.attr("transform", d => `translate(${d.x},${d.y})`);
+        });
+
+        // Drag Handler
+        function drag(sim) {
+            function dragstarted(event, d) {
+                if (!event.active) sim.alphaTarget(0.3).restart();
+                d.fx = d.x;
+                d.fy = d.y;
+            }
+            function dragged(event, d) {
+                d.fx = event.x;
+                d.fy = event.y;
+            }
+            function dragended(event, d) {
+                if (!event.active) sim.alphaTarget(0);
+                d.fx = null;
+                d.fy = null;
+            }
+            return d3.drag()
+                .on("start", dragstarted)
+                .on("drag", dragged)
+                .on("end", dragended);
+        }
+
+        /* 3. DRAWER CONTROLLER */
+        const drawer = document.getElementById('universe-drawer');
+
+        function openDrawer(data) {
+            // Label Semesta paling atas (misal: SEMESTA 1947)
+            document.getElementById('drawer-semesta-label').innerText = data.id.toUpperCase();
+            // Judul Semesta di bawahnya (misal: Odyssey / Brutal Legacy)
+            document.getElementById('drawer-title').innerText = data.name;
+
+            document.getElementById('drawer-desc').innerText = data.desc;
+            document.getElementById('drawer-anchor-name').innerText = data.anchorBeing;
+
+            document.getElementById('drawer-status-val').innerText = data.status;
+            document.getElementById('drawer-populasi-val').innerText = data.populasi;
+            document.getElementById('drawer-diciptakan-val').innerText = data.diciptakan;
+            document.getElementById('drawer-dihancurkan-val').innerText = data.dihancurkan;
+
+            const isExisting = data.status === "Existing Universe";
+            const themeColor = isExisting ? "#40c4ff" : "#b3122a";
+            const bgAlphaColor = isExisting ? "rgba(64, 196, 255, 0.1)" : "rgba(179, 18, 42, 0.1)";
+
+            // Update Warna Label ID SEMESTA
+            const semestaLabel = document.getElementById('drawer-semesta-label');
+            semestaLabel.style.color = themeColor;
+
+            // Update Warna Text Status Value
+            const statusVal = document.getElementById('drawer-status-val');
+            statusVal.style.color = themeColor;
+
+            // Update Warna Icon SVG Bumi
+            const iconBox = document.getElementById('drawer-icon-box');
+            iconBox.style.borderColor = themeColor;
+            iconBox.style.backgroundColor = bgAlphaColor;
+
+            const iconSvg = document.getElementById('drawer-icon-svg');
+            iconSvg.style.color = themeColor;
+
+            // Update Warna Icon Diamond/Rhombus List
+            for (let i = 1; i <= 4; i++) {
+                const diamondIcon = document.getElementById(`diamond-icon-${i}`);
+                if (diamondIcon) diamondIcon.style.color = themeColor;
+            }
+
+            drawer.classList.remove('translate-y-full', 'sm:translate-y-0', 'sm:translate-x-full');
+        }
+
+        function closeDrawer() {
+            drawer.classList.add('translate-y-full', 'sm:translate-y-0', 'sm:translate-x-full');
+        }
+
+        svg.on("click", () => closeDrawer());
+
+        window.addEventListener('resize', () => {
+            svg.attr("width", window.innerWidth).attr("height", window.innerHeight);
+            simulation.force("center", d3.forceCenter(window.innerWidth / 2, window.innerHeight / 2 + 40)).restart();
+        });
+    </script>
+</body>
+</html>

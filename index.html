@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mineverse Portal | Assets & Community</title>
+    
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cosmic: '#0b0b0d',
+                        cardbg: 'rgba(18, 18, 22, 0.80)',
+                        cardborder: '#22222c',
+                        mineblue: '#40c4ff',
+                        minered: '#b3122a',
+                        mineyellow: '#ffa100',
+                        minegreen: '#2cd158',
+                    },
+                    fontFamily: {
+                        tech: ['Plus Jakarta Sans', 'sans-serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0b0b0d;
+            color: #ffffff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .glass-nav {
+            background: rgba(11, 11, 13, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid #22222c;
+        }
+
+        .bg-cardbg {
+            background-color: rgba(18, 18, 22, 0.80);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        .card-hover-lift {
+            transition: transform 0.45s cubic-bezier(0.15, 0.85, 0.2, 1), border-color 0.3s ease;
+        }
+        .card-hover-lift:hover {
+            transform: translateY(-6px);
+            border-color: #40c4ff;
+        }
+
+        @keyframes tabFadeIn {
+            0% { opacity: 0; transform: translateY(25px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .tab-animate-in {
+            animation: tabFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .shine-effect {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shine-effect::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 30%;
+            height: 200%;
+            background: linear-gradient(
+                to right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.6) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: rotate(25deg);
+        }
+
+        .shine-effect:hover::after {
+            animation: manual-shine 0.75s ease-in-out forwards;
+        }
+
+        @keyframes manual-shine {
+            0% { left: -60%; }
+            100% { left: 130%; }
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .animate-marquee {
+            display: flex;
+            width: max-content;
+            animation: marquee 35s linear infinite;
+        }
+
+        .animate-marquee:hover {
+            animation-play-state: paused;
+        }
+
+        .reveal-up {
+            opacity: 0;
+            transform: translateY(35px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal-up.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ---- Menu HP (hamburger) & responsif ---- */
+        html { scroll-padding-top: 84px; }
+        #mv-burger span { display: block; width: 22px; height: 2px; background: #fff; border-radius: 2px; transition: transform .3s, opacity .3s; }
+        #mv-burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        #mv-burger.open span:nth-child(2) { opacity: 0; }
+        #mv-burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+        #mv-menu { max-height: 0; overflow: hidden; visibility: hidden; transition: max-height .35s ease, visibility .35s; }
+        #mv-menu.open { max-height: 320px; visibility: visible; }
+        @media (max-width: 640px) {
+            main section h2 { font-size: 1.875rem; line-height: 1.2; overflow-wrap: anywhere; }
+            main section h3 { overflow-wrap: anywhere; }
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0b0b0d; }
+        ::-webkit-scrollbar-thumb { background: #22222c; border-radius: 4px; border: 1px solid #40c4ff; }
+    </style>
+</head>
+<body class="bg-cosmic text-white relative">
+
+    <canvas id="starfield"></canvas>
+
+    <!-- NAVBAR -->
+    <header class="fixed top-0 left-0 w-full z-50 glass-nav px-5 sm:px-6 lg:px-16 py-3 sm:py-4 flex items-center justify-between transition-all duration-300">
+        <a href="#home" class="flex items-center gap-3">
+            <img src="logo.png" alt="Mineverse Logo" class="w-9 h-9 sm:w-10 sm:h-10 object-contain">
+            <span class="font-extrabold text-lg sm:text-xl tracking-wider text-white">MINEVERSE</span>
+        </a>
+
+        <nav class="hidden md:flex items-center gap-8 font-semibold text-sm tracking-wide text-gray-300">
+            <a href="#home" class="text-mineblue hover:text-mineblue transition-colors">Home</a>
+            <a href="blog.html" class="hover:text-mineblue transition-colors">Blog</a>
+            <a href="team.html" class="hover:text-mineblue transition-colors">Team</a>
+            <a href="#branch" class="hover:text-mineblue transition-colors">Multiverse</a>
+        </nav>
+
+        <button id="mv-burger" type="button" aria-label="Menu" aria-expanded="false" aria-controls="mv-menu" class="md:hidden flex flex-col gap-[5px] p-2.5 -mr-2.5"><span></span><span></span><span></span></button>
+        <div id="mv-menu" class="md:hidden absolute top-full left-0 w-full glass-nav">
+            <a href="#home" class="block px-6 py-3.5 text-sm font-semibold tracking-wide border-t border-cardborder text-mineblue">Home</a>
+            <a href="blog.html" class="block px-6 py-3.5 text-sm font-semibold tracking-wide border-t border-cardborder text-gray-300 hover:text-mineblue transition-colors">Blog</a>
+            <a href="team.html" class="block px-6 py-3.5 text-sm font-semibold tracking-wide border-t border-cardborder text-gray-300 hover:text-mineblue transition-colors">Team</a>
+            <a href="multiverse.html" class="block px-6 py-3.5 text-sm font-semibold tracking-wide border-t border-cardborder text-gray-300 hover:text-mineblue transition-colors">Multiverse</a>
+        </div>
+    </header>
+
+    <main class="relative z-10">
+
+        <!-- 1. HERO SECTION -->
+        <section id="home" class="min-h-[85vh] flex flex-col items-center justify-center text-center px-5 sm:px-6 pt-24 pb-12">
+            <span class="mb-6 px-4 py-1.5 rounded-lg bg-cardbg border border-cardborder text-xs font-bold text-mineblue uppercase tracking-widest">Minecraft Community</span>
+
+            <h1 class="font-extrabold text-[2.1rem] sm:text-6xl lg:text-7xl max-w-5xl tracking-tight mb-6 leading-tight uppercase">
+                WELCOME TO <br><span class="text-mineblue">MINEVERSE</span>
+            </h1>
+
+            <p class="text-gray-400 max-w-2xl text-base sm:text-lg mb-10 font-medium leading-relaxed">
+                Sebuah wadah bagi orang-orang kreatif untuk berkumpul, berkolaborasi, dan mengeksplorasi potensi mereka.
+            </p>
+
+            <a href="multiverse.html" class="px-8 py-4 rounded-lg bg-mineblue text-black font-extrabold text-sm tracking-wider uppercase hover:bg-mineblue/90 transition-all shine-effect">
+                jelajahi multisemesta
+            </a>
+        </section>
+
+        <!-- 2. LATEST BLOG SECTION -->
+        <section id="blog" class="py-10 sm:py-14 px-5 sm:px-6 lg:px-16 max-w-7xl mx-auto reveal-up">
+            <div class="flex items-start gap-5 mb-10">
+                <div class="w-1.5 bg-mineblue rounded-none self-stretch flex-shrink-0"></div>
+                <div class="flex-grow">
+                    <div class="flex items-center gap-4 mb-3">
+                        <span class="text-xs font-bold text-mineblue tracking-widest uppercase">SECTOR 01</span>
+                        <div class="flex-grow h-[1px] bg-cardborder"></div>
+                        <span class="text-xs font-medium text-gray-400 uppercase tracking-widest">ARTICLE</span>
+                    </div>
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+                        <h2 class="font-extrabold text-4xl sm:text-5xl tracking-tight uppercase">BLOG TERBARU</h2>
+                        <a href="blog.html" class="px-4 py-2 rounded-lg bg-cardbg border border-cardborder text-xs font-bold text-mineblue hover:bg-mineblue hover:text-black hover:border-mineblue transition-all uppercase tracking-wider inline-flex items-center gap-2 shine-effect">
+                            Buka Halaman Artikel ↗
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Blog 1 -->
+                <div class="bg-cardbg border border-cardborder rounded-lg p-6 card-hover-lift group flex flex-col justify-between shadow-xl">
+                    <div>
+                        <div class="h-44 bg-cosmic border border-cardborder rounded-md mb-4 overflow-hidden relative flex items-center justify-center">
+                            <span class="text-xs text-gray-600 font-bold uppercase">Esports Banner</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs font-bold mb-3 uppercase tracking-wider">
+                            <span class="text-gray-400">20 OKT 2026</span>
+                            <span class="text-mineblue font-extrabold">ESPORTS</span>
+                        </div>
+                        <h3 class="font-bold text-lg mb-3 group-hover:text-mineblue transition-colors leading-snug">VOCÊ É BRABA // Hype Film VALORANT Game Changers Championship 2026</h3>
+                        <p class="text-gray-400 text-xs font-medium leading-relaxed mb-6">Tonton siaran langsung VCT Game Changers Championship 2026, 22 Okt-1 Nov di São Paulo, Brasil.</p>
+                    </div>
+                    <div class="pt-4 border-t border-cardborder flex items-center justify-between text-xs text-gray-500 font-medium">
+                        <div><span>Ditulis oleh Alzena</span></div>
+                        <div class="flex items-center gap-1.5 text-gray-400">
+                            <svg class="w-3.5 h-3.5 text-mineblue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            <span>0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Blog 2 -->
+                <div class="bg-cardbg border border-cardborder rounded-lg p-6 card-hover-lift group flex flex-col justify-between shadow-xl">
+                    <div>
+                        <div class="h-44 bg-cosmic border border-cardborder rounded-md mb-4 overflow-hidden relative flex items-center justify-center">
+                            <span class="text-xs text-gray-600 font-bold uppercase">Update Banner</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs font-bold mb-3 uppercase tracking-wider">
+                            <span class="text-gray-400">18 OKT 2026</span>
+                            <span class="text-mineblue font-extrabold">UPDATE</span>
+                        </div>
+                        <h3 class="font-bold text-lg mb-3 group-hover:text-mineblue transition-colors leading-snug">NAIK DAN TURUN // Trailer Agen Hush - VALORANT</h3>
+                        <p class="text-gray-400 text-xs font-medium leading-relaxed mb-6">Agen Duelist Baru hadir di Season 26 // ACT VI dengan kemampuan mobilitas tinggi.</p>
+                    </div>
+                    <div class="pt-4 border-t border-cardborder flex items-center justify-between text-xs text-gray-500 font-medium">
+                        <div><span>Ditulis oleh Reymazu</span></div>
+                        <div class="flex items-center gap-1.5 text-gray-400">
+                            <svg class="w-3.5 h-3.5 text-mineblue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            <span>0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Blog 3 -->
+                <div class="bg-cardbg border border-cardborder rounded-lg p-6 card-hover-lift group flex flex-col justify-between shadow-xl">
+                    <div>
+                        <div class="h-44 bg-cosmic border border-cardborder rounded-md mb-4 overflow-hidden relative flex items-center justify-center">
+                            <span class="text-xs text-gray-600 font-bold uppercase">Merch Banner</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs font-bold mb-3 uppercase tracking-wider">
+                            <span class="text-gray-400">15 OKT 2026</span>
+                            <span class="text-mineblue font-extrabold">MERCH</span>
+                        </div>
+                        <h3 class="font-bold text-lg mb-3 group-hover:text-mineblue transition-colors leading-snug">Koleksi VALORANT X POP MART Baru</h3>
+                        <p class="text-gray-400 text-xs font-medium leading-relaxed mb-6">Tingkatkan koleksimu baik di dalam maupun di luar game. Sudah tersedia di POP MART terdekat.</p>
+                    </div>
+                    <div class="pt-4 border-t border-cardborder flex items-center justify-between text-xs text-gray-500 font-medium">
+                        <div><span>Ditulis oleh Kei Sora</span></div>
+                        <div class="flex items-center gap-1.5 text-gray-400">
+                            <svg class="w-3.5 h-3.5 text-mineblue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            <span>0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. ABOUT & INTERACTIVE TABS SECTION -->
+        <section id="about-sector" class="py-10 sm:py-14 px-5 sm:px-6 lg:px-16 max-w-7xl mx-auto reveal-up">
+            <div class="flex items-start gap-5 mb-10">
+                <div class="w-1.5 bg-mineblue rounded-none self-stretch flex-shrink-0"></div>
+                <div class="flex-grow">
+                    <div class="flex items-center gap-4 mb-3">
+                        <span class="text-xs font-bold text-mineblue tracking-widest uppercase">SECTOR 02</span>
+                        <div class="flex-grow h-[1px] bg-cardborder"></div>
+                        <span class="text-xs font-medium text-gray-400 uppercase tracking-widest">ABOUT US</span>
+                    </div>
+                    
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+                        <h2 class="font-extrabold text-4xl sm:text-5xl tracking-tight uppercase">Tentang Mineverse</h2>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="switchTab('tentang')" id="btn-tentang" class="tab-btn px-4 py-2 rounded-lg bg-mineblue text-black font-bold text-xs uppercase transition-all shadow-md">Tentang</button>
+                            <button onclick="switchTab('milestone')" id="btn-milestone" class="tab-btn px-4 py-2 rounded-lg bg-cardbg border border-cardborder text-gray-400 font-bold text-xs uppercase transition-all hover:border-mineblue hover:text-mineblue">Milestone</button>
+                            <button onclick="switchTab('partnership')" id="btn-partnership" class="tab-btn px-4 py-2 rounded-lg bg-cardbg border border-cardborder text-gray-400 font-bold text-xs uppercase transition-all hover:border-mineblue hover:text-mineblue">Partnership</button>
+                            <button onclick="switchTab('support')" id="btn-support" class="tab-btn px-4 py-2 rounded-lg bg-cardbg border border-cardborder text-gray-400 font-bold text-xs uppercase transition-all hover:border-mineblue hover:text-mineblue">Support</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KONTEN TAB -->
+            <div id="tab-content-container" class="bg-transparent border-0 p-0 shadow-none">
+                
+                <!-- TAB 1: TENTANG -->
+                <div id="content-tentang" class="tab-pane tab-animate-in">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                        <div class="lg:col-span-6 bg-cardbg border border-cardborder rounded-lg px-5 sm:px-10 py-8 sm:py-10 card-hover-lift flex flex-col justify-between shadow-2xl group">
+                            <div>
+                                <h3 class="font-extrabold text-2xl sm:text-3xl mb-4 text-white group-hover:text-mineblue transition-colors uppercase">Apa itu Mineverse</h3>
+                                <p class="text-gray-300 text-sm sm:text-base leading-relaxed mb-8 font-medium">
+                                    Mineverse adalah komunitas independen yang berfokus pada pengembangan ekosistem kreatif berbasis Minecraft. Kami memfasilitasi kreator, pembangun, dan pengembang untuk menciptakan karya-karya luar biasa bersama-sama.
+                                </p>
+                            </div>
+                            
+                            <div class="flex justify-between items-center w-full px-2 sm:px-6 pt-6 border-t border-cardborder">
+                                <div class="text-left">
+                                    <span class="text-[10px] text-gray-500 font-bold uppercase block mb-1">LOCATION</span>
+                                    <span class="text-xs sm:text-sm font-bold text-white">Indonesia</span>
+                                </div>
+                                <div class="text-center">
+                                    <span class="text-[10px] text-gray-500 font-bold uppercase block mb-1">SINCE</span>
+                                    <span class="text-xs sm:text-sm font-bold text-white">2024</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-[10px] text-gray-500 font-bold uppercase block mb-1">FOUNDER</span>
+                                    <span class="text-xs sm:text-sm font-bold text-white">Alzena</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-6 grid grid-cols-2 gap-4">
+                            <div class="bg-cardbg border border-cardborder rounded-lg p-6 card-hover-lift text-center flex flex-col items-center justify-center shadow-xl">
+                                <div class="relative w-20 h-20 flex items-center justify-center mb-3">
+                                    <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                                        <path class="text-cardborder" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                        <path class="text-mineblue" stroke-dasharray="85, 100" stroke-width="3.5" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                    </svg>
+                                    <span class="absolute font-extrabold text-lg text-white">50+</span>
+                                </div>
+                                <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Project</span>
+                            </div>
+                            <div class="bg-cardbg border border-cardborder rounded-lg p-6 card-hover-lift text-center flex flex-col items-center justify-center shadow-xl">
+                                <div class="relative w-20 h-20 flex items-center justify-center mb-3">
+                                    <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                                        <path class="text-cardborder" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                        <path class="text-mineblue" stroke-dasharray="60, 100" stroke-width="3.5" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                    </svg>
+                                    <span class="absolute font-extrabold text-lg text-white">3</span>
+                                </div>
+                                <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Branches</span>
+                            </div>
+                            <div class="bg-cardbg border border-cardborder rounded-lg p-6 card-hover-lift text-center flex flex-col items-center justify-center shadow-xl">
+                                <div class="relative w-20 h-20 flex items-center justify-center mb-3">
+                                    <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                                        <path class="text-cardborder" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                        <path class="text-mineblue" stroke-dasharray="75, 100" stroke-width="3.5" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                    </svg>
+                                    <span class="absolute font-extrabold text-lg text-white">2</span>
+                                </div>
+                                <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Years</span>
+                            </div>
+                            <div class="bg-cardbg border border-cardborder rounded-lg p-6 card-hover-lift text-center flex flex-col items-center justify-center shadow-xl">
+                                <div class="relative w-20 h-20 flex items-center justify-center mb-3">
+                                    <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                                        <path class="text-cardborder" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                        <path class="text-mineblue" stroke-dasharray="90, 100" stroke-width="3.5" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                    </svg>
+                                    <span class="absolute font-extrabold text-lg text-white">30+</span>
+                                </div>
+                                <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Active Members</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: MILESTONE -->
+                <div id="content-milestone" class="tab-pane hidden">
+                    <h3 class="font-extrabold text-3xl sm:text-4xl text-white uppercase tracking-tight mb-3 text-center">Perjalanan Kami</h3>
+                    <p class="text-gray-400 text-sm font-medium leading-relaxed text-center max-w-2xl mx-auto mb-10">Melihat kembali jejak langkah, pertumbuhan, dan pencapaian besar yang telah diukir oleh komunitas Mineverse dari tahun ke tahun.</p>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                        <div class="lg:col-span-5 flex flex-col gap-4 m-0 p-0">
+
+                            <!-- Milestone Item 0 -->
+                            <div onclick="selectMilestone(0)" id="ms-card-0" class="cursor-pointer relative z-10 flex items-center gap-4">
+                                <span class="absolute left-[19px] top-1/2 w-0.5 h-[calc(100%+1rem)] bg-cardborder -z-10 pointer-events-none"></span>
+                                <div id="ms-node-0" class="w-10 h-10 rounded-full bg-cosmic border border-mineblue flex items-center justify-center font-extrabold text-mineblue flex-shrink-0 shadow-md">1</div>
+                                <div class="flex-grow bg-cardbg border border-mineblue rounded-lg p-4 card-hover-lift transition-all shadow-xl">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-xs text-mineblue font-bold">15 Des 2023</span>
+                                        <span class="text-[10px] text-gray-500 uppercase font-bold">Pre-Launch</span>
+                                    </div>
+                                    <h4 class="font-bold text-sm text-white">Brutal Community</h4>
+                                </div>
+                            </div>
+
+                            <!-- Milestone Item 1 -->
+                            <div onclick="selectMilestone(1)" id="ms-card-1" class="cursor-pointer relative z-10 flex items-center gap-4">
+                                <span class="absolute left-[19px] top-1/2 w-0.5 h-[calc(100%+1rem)] bg-cardborder -z-10 pointer-events-none"></span>
+                                <div id="ms-node-1" class="w-10 h-10 rounded-full bg-cosmic border border-cardborder flex items-center justify-center font-extrabold text-gray-300 flex-shrink-0 shadow-md">2</div>
+                                <div class="flex-grow bg-cardbg border border-cardborder rounded-lg p-4 card-hover-lift transition-all shadow-xl hover:border-mineblue">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-xs text-mineblue font-bold">15 Apr 2024</span>
+                                        <span class="text-[10px] text-gray-500 uppercase font-bold">Official Launch</span>
+                                    </div>
+                                    <h4 class="font-bold text-sm text-white">Peluncuran Perdana Mineverse</h4>
+                                </div>
+                            </div>
+
+                            <!-- Milestone Item 2 -->
+                            <div onclick="selectMilestone(2)" id="ms-card-2" class="cursor-pointer relative z-10 flex items-center gap-4">
+                                <span class="absolute left-[19px] top-1/2 w-0.5 h-[calc(100%+1rem)] bg-cardborder -z-10 pointer-events-none"></span>
+                                <div id="ms-node-2" class="w-10 h-10 rounded-full bg-cosmic border border-cardborder flex items-center justify-center font-extrabold text-gray-300 flex-shrink-0 shadow-md">3</div>
+                                <div class="flex-grow bg-cardbg border border-cardborder rounded-lg p-4 card-hover-lift transition-all shadow-xl hover:border-mineblue">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-xs text-mineblue font-bold">8 Jun 2024</span>
+                                        <span class="text-[10px] text-gray-500 uppercase font-bold">Game Changing</span>
+                                    </div>
+                                    <h4 class="font-bold text-sm text-white">Perubahan Arah &amp; Tujuan</h4>
+                                    <p class="text-[11px] text-gray-400">Infrastruktur & Kolaborasi Kreator</p>
+                                </div>
+                            </div>
+
+                            <!-- Milestone Item 3 -->
+                            <div onclick="selectMilestone(3)" id="ms-card-3" class="cursor-pointer relative z-10 flex items-center gap-4">
+                                <span class="absolute left-[19px] top-1/2 w-0.5 h-[calc(100%+1rem)] bg-cardborder -z-10 pointer-events-none"></span>
+                                <div id="ms-node-3" class="w-10 h-10 rounded-full bg-cosmic border border-cardborder flex items-center justify-center font-extrabold text-gray-300 flex-shrink-0 shadow-md">4</div>
+                                <div class="flex-grow bg-cardbg border border-cardborder rounded-lg p-4 card-hover-lift transition-all shadow-xl hover:border-mineblue">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-xs text-mineblue font-bold">Jan 2025</span>
+                                        <span class="text-[10px] text-gray-500 uppercase font-bold">Next-Gen</span>
+                                    </div>
+                                    <h4 class="font-bold text-sm text-white">Era baru untuk Mineverse</h4>
+                                    <p class="text-[11px] text-gray-400">Inovasi Web & Hub Komunitas</p>
+                                </div>
+                            </div>
+
+                            <!-- Milestone Item 4 -->
+                            <div onclick="selectMilestone(4)" id="ms-card-4" class="cursor-pointer relative z-10 flex items-center gap-4">
+                                <div id="ms-node-4" class="w-10 h-10 rounded-full bg-cosmic border border-cardborder flex items-center justify-center font-extrabold text-gray-300 flex-shrink-0 shadow-md">5</div>
+                                <div class="flex-grow bg-cardbg border border-cardborder rounded-lg p-4 card-hover-lift transition-all shadow-xl hover:border-mineblue">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-xs text-mineblue font-bold">Masa Sekarang</span>
+                                        <span class="text-[10px] text-gray-500 uppercase font-bold">Community Hub</span>
+                                    </div>
+                                    <h4 class="font-bold text-sm text-white">Mineverse</h4>
+                                    <p class="text-[11px] text-gray-400">Skala Komunitas & Kerjasama Luas</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-7 bg-cardbg border border-cardborder rounded-lg p-8 card-hover-lift shadow-xl m-0 self-start">
+                            <div class="flex flex-wrap justify-between items-center mb-4">
+                                <h4 id="ms-title" class="font-extrabold text-2xl text-white">Pembentukan Brutal Community</h4>
+                                <div class="flex items-center gap-3 text-xs text-gray-400 font-semibold">
+                                    <span id="ms-org" class="text-mineblue font-bold">Pre-Launch</span>
+                                    <span id="ms-date">15 Desember 2023</span>
+                                </div>
+                            </div>
+                            <p id="ms-desc" class="text-gray-300 text-sm mb-6 leading-relaxed">
+                                Sebelum Mineverse terbentuk, perjalanan kami dimulai dari Brutal Community. Sesuai namanya, komunitas ini dibentuk khusus sebagai wadah untuk membahas segala hal seputar Komunitas BRUTAL. Pada masa ini, Brutal Community masih berada di bawah naungan Viva Universe Fanbase.
+                            </p>
+                            <div class="border-t border-cardborder pt-6">
+                                <span class="text-xs font-bold text-mineblue uppercase block mb-3 tracking-wider">ACHIEVEMENTS</span>
+                                <ul id="ms-achievements" class="text-xs text-gray-300 space-y-2.5 list-disc list-inside">
+                                    <li>Berhasil meraih 5000+ Pengikut di Instagram.</li>
+                                    <li>Terhubung dengan komunitas BRUTAL langsung.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- TAB 3: PARTNERSHIP -->
+                <div id="content-partnership" class="tab-pane hidden">
+                    <div class="text-center max-w-2xl mx-auto mb-10">
+                        <h3 class="font-extrabold text-3xl sm:text-4xl text-white uppercase tracking-tight mb-3">PARTNER KAMI</h3>
+                        <p class="text-gray-400 text-sm font-medium leading-relaxed">Berikut ini adalah komunitas yang telah menjadi partner dari Mineverse.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                        <div class="bg-cardbg border border-cardborder rounded-lg p-6 card-hover-lift shadow-xl flex flex-col justify-between hover:border-mineblue transition-all">
+                            <div>
+                                <div class="flex items-center gap-3 mb-4">
+                                    <img src="logo.png" alt="Partner Logo" class="w-10 h-10 object-contain">
+                                    <div>
+                                        <h4 class="font-bold text-base text-white">Promise Media</h4>
+                                        <span class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">COMMUNITY PARTNER</span>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-gray-400 font-medium leading-relaxed mb-6">
+                                    Komunitas media digital yang fokus menampilkan berita seputar game di indonesia.
+                                </p>
+                            </div>
+                            <div class="pt-4 border-t border-cardborder">
+                                <span class="text-[10px] text-gray-500 font-bold uppercase tracking-wider block mb-1">FOUNDER</span>
+                                <span class="text-xs font-bold text-white">Justin</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-cardbg border border-cardborder rounded-lg p-6 card-hover-lift shadow-xl flex flex-col justify-between hover:border-mineblue transition-all">
+                            <div>
+                                <div class="flex items-center gap-3 mb-4">
+                                    <img src="logo.png" alt="Partner Logo" class="w-10 h-10 object-contain">
+                                    <div>
+                                        <h4 class="font-bold text-base text-white">OctaveSyncrea</h4>
+                                        <span class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">COMMUNITY PARTNER</span>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-gray-400 font-medium leading-relaxed mb-6">
+                                    Sebuah ekosistem yang berisikan individu kreatif yang fokus untuk menciptakan karya digital seperti desain grafis, ilustrasi, dll.
+                                </p>
+                            </div>
+                            <div class="pt-4 border-t border-cardborder">
+                                <span class="text-[10px] text-gray-500 font-bold uppercase tracking-wider block mb-1">FOUNDER</span>
+                                <span class="text-xs font-bold text-white">Nazuma</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-cardbg border border-cardborder rounded-lg p-6 card-hover-lift shadow-xl flex flex-col justify-between hover:border-mineblue transition-all">
+                            <div>
+                                <div class="flex items-center gap-3 mb-4">
+                                    <img src="logo.png" alt="Partner Logo" class="w-10 h-10 object-contain">
+                                    <div>
+                                        <h4 class="font-bold text-base text-white">NANAIRO NO PALETTE</h4>
+                                        <span class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">COMMUNITY PARTNER</span>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-gray-400 font-medium leading-relaxed mb-6">
+                                    Agensi RVN yang berfokus pada proyek cover lagu, pengembangan trainee, serta berbagai kegiatan musikal.
+                                </p>
+                            </div>
+                            <div class="pt-4 border-t border-cardborder">
+                                <span class="text-[10px] text-gray-500 font-bold uppercase tracking-wider block mb-1">FOUNDER</span>
+                                <span class="text-xs font-bold text-white">Mirethea</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--<div class="bg-cardbg border border-cardborder rounded-lg p-6 sm:p-8 card-hover-lift shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-6">
+                        <div>
+                            <h4 class="font-bold text-lg text-white mb-1">Tertarik untuk menjalin Partnership?</h4>
+                            <p class="text-xs text-gray-400 font-medium">Klik tombol di sebelah kanan untuk langsung mendiskusikan peluang kolaborasi bersama kami.</p>
+                        </div>
+                        <a href="https://discord.gg/m8FVYTqZN" target="_blank" class="w-full sm:w-auto px-6 py-3.5 rounded-lg bg-mineblue text-black font-extrabold text-xs uppercase tracking-wider hover:bg-mineblue/90 transition-all shadow-md shadow-mineblue/20 flex-shrink-0 text-center shine-effect">
+                            Ajukan Partnership ↗
+                        </a>
+                    </div>-->
+                </div>
+
+                <!-- TAB 4: SUPPORT -->
+                <div id="content-support" class="tab-pane hidden">
+                    <div class="text-center max-w-2xl mx-auto mb-10">
+                        <h3 class="font-extrabold text-3xl sm:text-4xl text-white uppercase tracking-tight mb-3">DUKUNGAN & DONASI</h3>
+                        <p class="text-gray-400 text-sm font-medium leading-relaxed">Terimakasih banyak kepada kalian yang sudah mendukung kami!.</p>
+                    </div>
+
+                    <div class="overflow-hidden py-2 mb-8">
+                        <div class="animate-marquee gap-6">
+                            <div class="w-80 bg-cardbg border border-cardborder rounded-lg p-6 card-hover-lift flex-shrink-0 shadow-lg">
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="font-bold text-sm text-white">Akarri</span>
+                                    <span class="text-xs font-bold text-mineblue">Rp 100.000</span>
+                                </div>
+                                <p class="text-xs text-gray-400 leading-relaxed font-medium">"Pertama kali coba server dari Mineverse, dan sejauh ini mantap banget dipake. Adminnya ramah, service cepat dan nggak pake lama!"</p>
+                            </div>
+                            <div class="w-80 bg-cardbg border border-cardborder rounded-lg p-6 card-hover-lift flex-shrink-0 shadow-lg">
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="font-bold text-sm text-white">BlackBeeID</span>
+                                    <span class="text-xs font-bold text-mineblue">Rp 250.000</span>
+                                </div>
+                                <p class="text-xs text-gray-400 leading-relaxed font-medium">"Awalnya sempat bingung cari server yang cocok. Setelah pakai, servernya terasa kencang, stabil, dan nyaman banget buat main bareng!"</p>
+                            </div>
+                            <div class="w-80 bg-cardbg border border-cardborder rounded-lg p-6 card-hover-lift flex-shrink-0 shadow-lg">
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="font-bold text-sm text-white">TicoVlame</span>
+                                    <span class="text-xs font-bold text-mineblue">Rp 75.000</span>
+                                </div>
+                                <p class="text-xs text-gray-400 leading-relaxed font-medium">"Admin ramah, server mantap. Buat yang ragu atau mau coba, langsung saja gabung karena pelayanannya super cepat!"</p>
+                            </div>
+                            <div class="w-80 bg-cardbg border border-cardborder rounded-lg p-6 card-hover-lift flex-shrink-0 shadow-lg">
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="font-bold text-sm text-white">Akarri</span>
+                                    <span class="text-xs font-bold text-mineblue">Rp 100.000</span>
+                                </div>
+                                <p class="text-xs text-gray-400 leading-relaxed font-medium">"Pertama kali coba server dari Mineverse, dan sejauh ini mantap banget dipake. Adminnya ramah, service cepat dan nggak pake lama!"</p>
+                            </div>
+                            <div class="w-80 bg-cardbg border border-cardborder rounded-lg p-6 card-hover-lift flex-shrink-0 shadow-lg">
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="font-bold text-sm text-white">BlackBeeID</span>
+                                    <span class="text-xs font-bold text-mineblue">Rp 250.000</span>
+                                </div>
+                                <p class="text-xs text-gray-400 leading-relaxed font-medium">"Awalnya sempat bingung cari server yang cocok. Setelah pakai, servernya terasa kencang, stabil, dan nyaman banget buat main bareng!"</p>
+                            </div>
+                            <div class="w-80 bg-cardbg border border-cardborder rounded-lg p-6 card-hover-lift flex-shrink-0 shadow-lg">
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="font-bold text-sm text-white">TicoVlame</span>
+                                    <span class="text-xs font-bold text-mineblue">Rp 75.000</span>
+                                </div>
+                                <p class="text-xs text-gray-400 leading-relaxed font-medium">"Admin ramah, server mantap. Buat yang ragu atau mau coba, langsung saja gabung karena pelayanannya super cepat!"</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-cardbg border border-cardborder rounded-lg p-6 sm:p-8 card-hover-lift shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-6">
+                        <div>
+                            <h4 class="font-bold text-lg text-white mb-1">Tertarik untuk mendukung komunitas ini?</h4>
+                            <p class="text-xs text-gray-400 font-medium">Setiap dukungan dari kamu sangat berarti untuk keberlangsungan dan pengembangan ekosistem Mineverse.</p>
+                        </div>
+                        <a href="https://saweria.co/mineverseid" target="_blank" class="w-full sm:w-auto px-6 py-3.5 rounded-lg bg-mineblue text-black font-extrabold text-xs uppercase tracking-wider hover:bg-mineblue/90 transition-all shadow-md shadow-mineblue/20 flex-shrink-0 text-center shine-effect">
+                            Donasi / Saweria ↗
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 4. TEAM SECTION -->
+        <section id="team" class="py-10 sm:py-14 px-5 sm:px-6 lg:px-16 max-w-7xl mx-auto reveal-up">
+            <div class="flex items-start gap-5 mb-10">
+                <div class="w-1.5 bg-mineblue rounded-none self-stretch flex-shrink-0"></div>
+                <div class="flex-grow">
+                    <div class="flex items-center gap-4 mb-3">
+                        <span class="text-xs font-bold text-mineblue tracking-widest uppercase">SECTOR 03</span>
+                        <div class="flex-grow h-[1px] bg-cardborder"></div>
+                        <span class="text-xs font-medium text-gray-400 uppercase tracking-widest">TEAM</span>
+                    </div>
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+                        <h2 class="font-extrabold text-4xl sm:text-5xl tracking-tight uppercase">Admineverse</h2>
+                        <a href="team.html" class="px-4 py-2 rounded-lg bg-cardbg border border-cardborder text-xs font-bold text-mineblue hover:bg-mineblue hover:text-black hover:border-mineblue transition-all uppercase tracking-wider inline-flex items-center gap-2 shine-effect">
+                            Lihat staff lainnya ↗
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overflow-hidden py-4">
+                <div class="animate-marquee gap-6">
+                    <div class="w-64 bg-cardbg border border-cardborder rounded-lg p-4 card-hover-lift flex-shrink-0 shadow-lg">
+                        <div class="h-64 bg-cosmic border border-cardborder rounded-md flex items-center justify-center">
+                            <span class="text-xs text-gray-600 font-bold uppercase">Skin / Avatar 01</span>
+                        </div>
+                    </div>
+                    <div class="w-64 bg-cardbg border border-cardborder rounded-lg p-4 card-hover-lift flex-shrink-0 shadow-lg">
+                        <div class="h-64 bg-cosmic border border-cardborder rounded-md flex items-center justify-center">
+                            <span class="text-xs text-gray-600 font-bold uppercase">Skin / Avatar 02</span>
+                        </div>
+                    </div>
+                    <div class="w-64 bg-cardbg border border-cardborder rounded-lg p-4 card-hover-lift flex-shrink-0 shadow-lg">
+                        <div class="h-64 bg-cosmic border border-cardborder rounded-md flex items-center justify-center">
+                            <span class="text-xs text-gray-600 font-bold uppercase">Skin / Avatar 03</span>
+                        </div>
+                    </div>
+                    <div class="w-64 bg-cardbg border border-cardborder rounded-lg p-4 card-hover-lift flex-shrink-0 shadow-lg">
+                        <div class="h-64 bg-cosmic border border-cardborder rounded-md flex items-center justify-center">
+                            <span class="text-xs text-gray-600 font-bold uppercase">Skin / Avatar 04</span>
+                        </div>
+                    </div>
+                    <div class="w-64 bg-cardbg border border-cardborder rounded-lg p-4 card-hover-lift flex-shrink-0 shadow-lg">
+                        <div class="h-64 bg-cosmic border border-cardborder rounded-md flex items-center justify-center">
+                            <span class="text-xs text-gray-600 font-bold uppercase">Skin / Avatar 05</span>
+                        </div>
+                    </div>
+                    <div class="w-64 bg-cardbg border border-cardborder rounded-lg p-4 card-hover-lift flex-shrink-0 shadow-lg">
+                        <div class="h-64 bg-cosmic border border-cardborder rounded-md flex items-center justify-center">
+                            <span class="text-xs text-gray-600 font-bold uppercase">Skin / Avatar 06</span>
+                        </div>
+                    </div>
+                    <div class="w-64 bg-cardbg border border-cardborder rounded-lg p-4 card-hover-lift flex-shrink-0 shadow-lg">
+                        <div class="h-64 bg-cosmic border border-cardborder rounded-md flex items-center justify-center">
+                            <span class="text-xs text-gray-600 font-bold uppercase">Skin / Avatar 07</span>
+                        </div>
+                    </div>
+
+                    <div class="w-64 bg-cardbg border border-cardborder rounded-lg p-4 card-hover-lift flex-shrink-0 shadow-lg">
+                        <div class="h-64 bg-cosmic border border-cardborder rounded-md flex items-center justify-center">
+                            <span class="text-xs text-gray-600 font-bold uppercase">Skin / Avatar 01</span>
+                        </div>
+                    </div>
+                    <div class="w-64 bg-cardbg border border-cardborder rounded-lg p-4 card-hover-lift flex-shrink-0 shadow-lg">
+                        <div class="h-64 bg-cosmic border border-cardborder rounded-md flex items-center justify-center">
+                            <span class="text-xs text-gray-600 font-bold uppercase">Skin / Avatar 02</span>
+                        </div>
+                    </div>
+                    <div class="w-64 bg-cardbg border border-cardborder rounded-lg p-4 card-hover-lift flex-shrink-0 shadow-lg">
+                        <div class="h-64 bg-cosmic border border-cardborder rounded-md flex items-center justify-center">
+                            <span class="text-xs text-gray-600 font-bold uppercase">Skin / Avatar 03</span>
+                        </div>
+                    </div>
+                    <div class="w-64 bg-cardbg border border-cardborder rounded-lg p-4 card-hover-lift flex-shrink-0 shadow-lg">
+                        <div class="h-64 bg-cosmic border border-cardborder rounded-md flex items-center justify-center">
+                            <span class="text-xs text-gray-600 font-bold uppercase">Skin / Avatar 04</span>
+                        </div>
+                    </div>
+                    <div class="w-64 bg-cardbg border border-cardborder rounded-lg p-4 card-hover-lift flex-shrink-0 shadow-lg">
+                        <div class="h-64 bg-cosmic border border-cardborder rounded-md flex items-center justify-center">
+                            <span class="text-xs text-gray-600 font-bold uppercase">Skin / Avatar 05</span>
+                        </div>
+                    </div>
+                    <div class="w-64 bg-cardbg border border-cardborder rounded-lg p-4 card-hover-lift flex-shrink-0 shadow-lg">
+                        <div class="h-64 bg-cosmic border border-cardborder rounded-md flex items-center justify-center">
+                            <span class="text-xs text-gray-600 font-bold uppercase">Skin / Avatar 06</span>
+                        </div>
+                    </div>
+                    <div class="w-64 bg-cardbg border border-cardborder rounded-lg p-4 card-hover-lift flex-shrink-0 shadow-lg">
+                        <div class="h-64 bg-cosmic border border-cardborder rounded-md flex items-center justify-center">
+                            <span class="text-xs text-gray-600 font-bold uppercase">Skin / Avatar 07</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. BRANCH SECTION -->
+        <section id="branch" class="py-10 sm:py-14 px-5 sm:px-6 lg:px-16 max-w-7xl mx-auto reveal-up">
+            <div class="flex items-start gap-5 mb-10">
+                <div class="w-1.5 bg-mineblue rounded-none self-stretch flex-shrink-0"></div>
+                <div class="flex-grow">
+                    <div class="flex items-center gap-4 mb-3">
+                        <span class="text-xs font-bold text-mineblue tracking-widest uppercase">SECTOR 04</span>
+                        <div class="flex-grow h-[1px] bg-cardborder"></div>
+                        <span class="text-xs font-medium text-gray-400 uppercase tracking-widest">BRANCHES</span>
+                    </div>
+                    <h2 class="font-extrabold text-4xl sm:text-5xl tracking-tight uppercase">CABANG MULTIVERSAL</h2>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Red Card (Mineverse Server) -->
+                <div class="bg-cardbg border border-cardborder rounded-lg p-8 card-hover-lift hover:border-minered transition-all flex flex-col justify-between shadow-xl group">
+                    <div>
+                        <div class="mb-6"><img src="logo.png" alt="Server Logo" class="w-14 h-14 object-contain"></div>
+                        <h3 class="font-black text-2xl mb-4 text-white group-hover:text-minered transition-colors uppercase">MINEVERSE SERVER</h3>
+                        <p class="text-gray-400 text-sm mb-6 font-medium leading-relaxed">
+                            Tempat seru buat main Minecraft bareng teman-teman secara online. Server kami siap diakses untuk pengguna versi Java maupun Bedrock.
+                        </p>
+                        <div class="text-[11px] font-bold text-gray-500 uppercase mb-6">SINCE MAY 2025</div>
+                    </div>
+                    <div class="pt-6 border-t border-cardborder flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] font-bold text-gray-500 uppercase block">FOUNDER</span>
+                            <span class="text-xs font-bold text-white">Alzena & Reymazu</span>
+                        </div>
+                        <a href="mineverse-server.html" class="px-5 py-2 rounded-md bg-cardbg border border-cardborder text-white font-bold text-xs uppercase group-hover:bg-minered group-hover:border-minered group-hover:text-white transition-all shine-effect">More</a>
+                    </div>
+                </div>
+
+                <!-- Yellow Card (Mineverse Studio) -->
+                <div class="bg-cardbg border border-cardborder rounded-lg p-8 card-hover-lift hover:border-mineyellow transition-all flex flex-col justify-between shadow-xl group">
+                    <div>
+                        <div class="mb-6"><img src="logo.png" alt="Studio Logo" class="w-14 h-14 object-contain"></div>
+                        <h3 class="font-black text-2xl mb-4 text-white group-hover:text-mineyellow transition-colors uppercase">MINEVERSE STUDIOS</h3>
+                        <p class="text-gray-400 text-sm mb-6 font-medium leading-relaxed">
+                            Wadah produksi konten visual dan sinematik lewat Minecraft. Kami memfokuskan diri untuk menggarap berbagai film, series, hingga cerita roleplay yang menarik.
+                        </p>
+                        <div class="text-[11px] font-bold text-gray-500 uppercase mb-6">SINCE JANUARY 2026</div>
+                    </div>
+                    <div class="pt-6 border-t border-cardborder flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] font-bold text-gray-500 uppercase block">FOUNDER</span>
+                            <span class="text-xs font-bold text-white">Alzena & Arcee</span>
+                        </div>
+                        <a href="mineverse-studio.html" class="px-5 py-2 rounded-md bg-cardbg border border-cardborder text-white font-bold text-xs uppercase group-hover:bg-mineyellow group-hover:border-mineyellow group-hover:text-black transition-all shine-effect">More</a>
+                    </div>
+                </div>
+
+                <!-- Green Card (Mineverse Store) -->
+                <div class="bg-cardbg border border-cardborder rounded-lg p-8 card-hover-lift hover:border-minegreen transition-all flex flex-col justify-between shadow-xl group">
+                    <div>
+                        <div class="mb-6"><img src="logo.png" alt="Store Logo" class="w-14 h-14 object-contain"></div>
+                        <h3 class="font-black text-2xl mb-4 text-white group-hover:text-minegreen transition-colors uppercase">MINEVERSE STORE</h3>
+                        <p class="text-gray-400 text-sm mb-6 font-medium leading-relaxed">
+                            Menyediakan berbagai jenis produk digital Minecraft. Di sini kamu bisa membeli skin minecraft, 3D render, hingga ilustrasi untuk karaktermu.
+                        </p>
+                        <div class="text-[11px] font-bold text-gray-500 uppercase mb-6">SINCE MARCH 2026</div>
+                    </div>
+                    <div class="pt-6 border-t border-cardborder flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] font-bold text-gray-500 uppercase block">FOUNDER</span>
+                            <span class="text-xs font-bold text-white">Kei Sora</span>
+                        </div>
+                        <a href="mineverse-store.html" class="px-5 py-2 rounded-md bg-cardbg border border-cardborder text-white font-bold text-xs uppercase group-hover:bg-minegreen group-hover:border-minegreen group-hover:text-black transition-all shine-effect">More</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. COMMUNITY HUB SECTION -->
+        <section id="community" class="py-10 sm:py-14 px-5 sm:px-6 lg:px-16 max-w-7xl mx-auto reveal-up">
+            <div class="flex items-start gap-5 mb-10">
+                <div class="w-1.5 bg-mineblue rounded-none self-stretch flex-shrink-0"></div>
+                <div class="flex-grow">
+                    <div class="flex items-center gap-4 mb-3">
+                        <span class="text-xs font-bold text-mineblue tracking-widest uppercase">SECTOR 05</span>
+                        <div class="flex-grow h-[1px] bg-cardborder"></div>
+                        <span class="text-xs font-medium text-gray-400 uppercase tracking-widest">COMMUNITY</span>
+                    </div>
+                    <h2 class="font-extrabold text-4xl sm:text-5xl tracking-tight uppercase">PLATFORM MEDIA MINEVERSE</h2>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+                <!-- Discord -->
+                <a href="https://discord.gg/m8FVYTqZN" target="_blank" class="bg-cardbg border border-cardborder rounded-lg p-6 card-hover-lift hover:border-mineblue transition-all group shadow-xl flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <svg class="w-8 h-8 text-white flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.011c3.927 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+                            <div>
+                                <h4 class="font-bold text-base text-white group-hover:text-mineblue transition-colors">Discord</h4>
+                                <span class="text-xs text-gray-400 font-medium">dsc.gg/mineverse</span>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-400 leading-relaxed font-medium">Bergabunglah dengan komunitas aktif kami di Discord untuk obrolan, dukungan, dan acara real-time.</p>
+                    </div>
+                </a>
+
+                <!-- TikTok -->
+                <a href="https://www.tiktok.com" target="_blank" class="bg-cardbg border border-cardborder rounded-lg p-6 card-hover-lift hover:border-mineblue transition-all group shadow-xl flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <svg class="w-8 h-8 text-white flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>
+                            <div>
+                                <h4 class="font-bold text-base text-white group-hover:text-mineblue transition-colors">TikTok</h4>
+                                <span class="text-xs text-gray-400 font-medium">@mineverse.id</span>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-400 leading-relaxed font-medium">Ikuti TikTok kami untuk klip menarik, tutorial, dan konten di balik layar.</p>
+                    </div>
+                </a>
+
+                <!-- Instagram -->
+                <a href="https://www.instagram.com/mineverse_official/" target="_blank" class="bg-cardbg border border-cardborder rounded-lg p-6 card-hover-lift hover:border-mineblue transition-all group shadow-xl flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <svg class="w-8 h-8 text-white flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                            <div>
+                                <h4 class="font-bold text-base text-white group-hover:text-mineblue transition-colors">Instagram</h4>
+                                <span class="text-xs text-gray-400 font-medium">@mineverse_official</span>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-400 leading-relaxed font-medium">Tinjau Instagram kami untuk pembaruan terbaru, acara, dan cuplikan komunitas.</p>
+                    </div>
+                </a>
+
+                <!-- WhatsApp -->
+                <a href="https://whatsapp.com" target="_blank" class="bg-cardbg border border-cardborder rounded-lg p-6 card-hover-lift hover:border-mineblue transition-all group shadow-xl flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <svg class="w-8 h-8 text-white flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+                            <div>
+                                <h4 class="font-bold text-base text-white group-hover:text-mineblue transition-colors">WhatsApp</h4>
+                                <span class="text-xs text-gray-400 font-medium">WhatsApp Channel</span>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-400 leading-relaxed font-medium">Berlangganan saluran WhatsApp kami untuk pemberitahuan instan dan pengumuman penting.</p>
+                    </div>
+                </a>
+
+                <!-- YouTube -->
+                <a href="https://www.youtube.com/@Mineverse.c" target="_blank" class="bg-cardbg border border-cardborder rounded-lg p-6 card-hover-lift hover:border-mineblue transition-all group shadow-xl flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <svg class="w-8 h-8 text-white flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                            <div>
+                                <h4 class="font-bold text-base text-white group-hover:text-mineblue transition-colors">YouTube</h4>
+                                <span class="text-xs text-gray-400 font-medium">@Mineverse.c</span>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-400 leading-relaxed font-medium">Tonton video sinematik, trailer, dan dokumentasi event terbaru kami di YouTube.</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-cardborder bg-cardbg pt-16 pb-12 px-6 lg:px-16 relative z-10">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-5 gap-8 mb-16">
+            <div class="md:col-span-2">
+                <div class="flex items-center gap-3 mb-4">
+                    <img src="logo.png" alt="Mineverse Logo" class="w-8 h-8 object-contain">
+                    <span class="font-bold text-lg tracking-wider text-white">Mineverse</span>
+                </div>
+                <p class="text-xs text-gray-400 leading-relaxed font-medium pr-6">
+                    A next-generation digital Minecraft ecosystem infrastructure designed specifically for creative people who need a platform to create.
+                </p>
+            </div>
+            <div class="md:col-span-1">
+                <h4 class="font-bold text-xs uppercase tracking-wider text-white mb-4">SOCIAL MEDIA</h4>
+                <ul class="space-y-2 text-xs font-medium text-gray-400">
+                    <li><a href="https://www.youtube.com/@Mineverse.c" target="_blank" class="hover:text-mineblue transition-colors">YouTube</a></li>
+                    <li><a href="https://www.instagram.com/mineverse_official/" target="_blank" class="hover:text-mineblue transition-colors">Instagram</a></li>
+                    <li><a href="https://discord.gg/m8FVYTqZN" target="_blank" class="hover:text-mineblue transition-colors">Discord</a></li>
+                </ul>
+            </div>
+            <div class="md:col-span-1">
+                <h4 class="font-bold text-xs uppercase tracking-wider text-white mb-4">DOCUMENT</h4>
+                <ul class="space-y-2 text-xs font-medium text-gray-400">
+                    <li><a href="#" class="hover:text-mineblue transition-colors">Branding</a></li>
+                    <li><a href="#about-sector" class="hover:text-mineblue transition-colors">Milestone</a></li>
+                    <li><a href="mailto:mineversepersonal@gmail.com" class="hover:text-mineblue transition-colors">Email</a></li>
+                </ul>
+            </div>
+            <div class="md:col-span-1">
+                <h4 class="font-bold text-xs uppercase tracking-wider text-white mb-4">SUPPORT</h4>
+                <ul class="space-y-2 text-xs font-medium text-gray-400">
+                    <li><a href="https://saweria.co/mineverseid" target="_blank" class="hover:text-mineblue transition-colors">Saweria</a></li>
+                    <li><a href="#about-sector" class="hover:text-mineblue transition-colors">Partnership</a></li>
+                    <li><a href="#about-sector" class="hover:text-mineblue transition-colors">Proposal</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto pt-8 border-t border-cardborder flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-gray-500 font-medium">
+            <div>&copy; 2026 Mineverse Portal. All Rights Reserved.</div>
+            <div class="flex items-center gap-2 text-gray-400">
+                <span class="w-2 h-2 rounded-full bg-mineblue inline-block"></span>
+                <span>Alzena - Owner & Founder Mineverse</span>
+                <span class="w-2 h-2 rounded-full bg-mineblue inline-block"></span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+
+        let stars = [];
+        const numStars = 140;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        for (let i = 0; i < numStars; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 1.2 + 0.3,
+                alpha: Math.random() * 0.6 + 0.2,
+                vx: (Math.random() - 0.5) * 0.3,
+                vy: (Math.random() - 0.5) * 0.3
+            });
+        }
+
+        function animateStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#ffffff';
+
+            stars.forEach(star => {
+                star.x += star.vx;
+                star.y += star.vy;
+
+                if (star.x < 0) star.x = canvas.width;
+                if (star.x > canvas.width) star.x = 0;
+                if (star.y < 0) star.y = canvas.height;
+                if (star.y > canvas.height) star.y = 0;
+
+                ctx.globalAlpha = star.alpha;
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            requestAnimationFrame(animateStars);
+        }
+        animateStars();
+
+        function switchTab(tabName) {
+            const panes = document.querySelectorAll('.tab-pane');
+            panes.forEach(pane => {
+                pane.classList.add('hidden');
+                pane.classList.remove('tab-animate-in');
+            });
+
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => {
+                btn.className = "tab-btn px-4 py-2 rounded-lg bg-cardbg border border-cardborder text-gray-400 font-bold text-xs uppercase transition-all hover:border-mineblue hover:text-mineblue";
+            });
+
+            const activePane = document.getElementById('content-' + tabName);
+            activePane.classList.remove('hidden');
+            void activePane.offsetWidth;
+            activePane.classList.add('tab-animate-in');
+
+            const activeBtn = document.getElementById('btn-' + tabName);
+            activeBtn.className = "tab-btn px-4 py-2 rounded-lg bg-mineblue text-black font-bold text-xs uppercase transition-all shadow-md";
+        }
+
+        const milestoneData = [
+            {
+                title: "Pembentukan Brutal Community",
+                org: "Pre-Launch",
+                date: "15 Desember 2023",
+                desc: "Sebelum Mineverse terbentuk, perjalanan kami dimulai dari Brutal Community. Sesuai namanya, komunitas ini dibentuk khusus sebagai wadah untuk membahas segala hal seputar Komunitas BRUTAL. Pada masa ini, Brutal Community masih berada di bawah naungan Viva Universe Fanbase.",
+                achievements: [
+                    "Berhasil meraih 5000+ Pengikut di Instagram.",
+                    "Terhubung dengan komunitas BRUTAL langsung."
+                ]
+            },
+            {
+                title: "Peluncuran Perdana Mineverse",
+                org: "Official Launch",
+                date: "15 April 2024",
+                desc: "Setelah tidak lagi menjadi bagian dari Viva Universe Fanbase, Mineverse secara resmi diluncurkan. Platform ini hadir untuk menaungi BrutalCommunity sekaligus merangkul komunitas lainnya seperti VivaCommunity, ReCommunity, BakwanCommunity, dan Bungul Community. Mineverse bertujuan menjadi rumah yang menaungi dan mendukung perkembangan komunitas Minecraft di Indonesia.",
+                achievements: [
+                    "Membentuk 5 Cabang & Menjalani lebih dari 10 Kerjasama.",
+                    "Berhasil meraih 10.000+ Pengikut di multiplatform.",
+                    "Menjadi salah satu Platform terlengkap di komunitas Minecraft Indonesia."
+                ]
+            },
+            {
+                title: "Perubahan Arah & Tujuan",
+                org: "Game Changing",
+                date: "8 Juni 2024",
+                desc: "Mineverse melakukan pembaruan secara menyeluruh, baik dari sistem internal maupun eksternal, yang diikuti dengan penyesuaian arah dan tujuan. Jika sebelumnya fokus utama kami adalah memperluas jaringan komunitas Minecraft, kini Mineverse berfokus untuk membangun dan mengenalkan nama Mineverse melalui karya-karya orisinal serta pengembangan potensi internal.",
+                achievements: [
+                    "Sistem Admineverse lebih mudah dikelola dan terstruktur."
+                ]
+            },
+            {
+                title: "Era baru untuk Mineverse",
+                org: "Next-Gen",
+                date: "10 Januari 2025",
+                desc: "Memasuki era baru, Mineverse lebih fleksibel dalam membuat konten apa pun dengan konsep apa pun agar bisa fokus berkarya dan makin dikenal luas. Sejalan dengan itu, Mineverse melepas lima cabang komunitas lama dan menggantikannya dengan tiga cabang baru: Mineverse Server, Mineverse Studio, dan Mineverse Store.",
+                achievements: [
+                    "Berhasil membuat Film Minecraft pertama karya Mineverse.",
+                    "Berhasil membangun server Minecraft yang dimainkan 50+ Orang.",
+                    "Berhasil menjual 4 Jenis produk digital yang berbeda-beda."
+                ]
+            },
+            {
+                title: "Mineverse",
+                org: "Community Hub",
+                date: "1 Juni 2025",
+                desc: "Saat ini, Mineverse telah berkembang menjadi komunitas yang berfokus pada kreativitas, dengan Minecraft sebagai sarana utama untuk mewujudkan ide-ide tersebut. Kami mengumpulkan orang-orang kreatif dengan bermacam visi dalam satu wadah yang sama, dengan harapan dapat memberikan perubahan besar di masa depan. Kami selalu terbuka bagi siapa saja yang ingin bergabung maupun bekerja sama.",
+                achievements: [
+                    "1 Juta Views Total di multiplatform.",
+                    "20.000 Pengikut Total di multiplatform.",
+                    "Mengerjakan 50+ projek & Menjalani 20+ Kerjasama."
+                ]
+            }
+        ];
+
+        function selectMilestone(index) {
+            for (let i = 0; i < milestoneData.length; i++) {
+                const card = document.getElementById('ms-card-' + i);
+                const circle = document.getElementById('ms-node-' + i);
+                const innerCard = card.querySelector('div:last-child');
+                if (i === index) {
+                    innerCard.className = "flex-grow bg-cardbg border border-mineblue rounded-lg p-4 card-hover-lift transition-all shadow-xl";
+                    circle.className = "w-10 h-10 rounded-full bg-cosmic border border-mineblue flex items-center justify-center font-extrabold text-mineblue flex-shrink-0 shadow-md";
+                } else {
+                    innerCard.className = "flex-grow bg-cardbg border border-cardborder rounded-lg p-4 card-hover-lift transition-all shadow-xl hover:border-mineblue";
+                    circle.className = "w-10 h-10 rounded-full bg-cosmic border border-cardborder flex items-center justify-center font-extrabold text-gray-300 flex-shrink-0 shadow-md";
+                }
+            }
+
+            const data = milestoneData[index];
+            document.getElementById('ms-title').innerText = data.title;
+            document.getElementById('ms-org').innerText = data.org;
+            document.getElementById('ms-date').innerText = data.date;
+            document.getElementById('ms-desc').innerText = data.desc;
+
+            const ul = document.getElementById('ms-achievements');
+            ul.innerHTML = '';
+            data.achievements.forEach(item => {
+                const li = document.createElement('li');
+                li.innerText = item;
+                ul.appendChild(li);
+            });
+        }
+
+        (function () {
+            const bt = document.getElementById('mv-burger'), mn = document.getElementById('mv-menu');
+            const set = o => { bt.classList.toggle('open', o); mn.classList.toggle('open', o); bt.setAttribute('aria-expanded', o); };
+            bt.onclick = e => { e.stopPropagation(); set(!mn.classList.contains('open')); };
+            mn.querySelectorAll('a').forEach(a => a.addEventListener('click', () => set(false)));
+            document.addEventListener('click', e => { if (!mn.contains(e.target)) set(false); });
+            addEventListener('keydown', e => { if (e.key === 'Escape') set(false); });
+            addEventListener('resize', () => { if (innerWidth >= 768) set(false); });
+        })();
+
+        const revealElements = document.querySelectorAll('.reveal-up');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        revealElements.forEach(el => observer.observe(el));
+    </script>
+</body>
+</html>

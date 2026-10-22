@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team | Mineverse</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/tw-config.js"></script>
+    <link rel="stylesheet" href="css/site.css">
+    <style>
+        /* Header ID card: gaya sama dengan label "MINEVERSE TEAM" */
+        .idc-brand{font-size:12px;font-weight:700;letter-spacing:.1em;color:#40c4ff;text-transform:uppercase}
+        .idc-title{color:#ffffff}
+        /* ID card versi HP: tegak (portrait) supaya tulisan tetap terbaca */
+        .idc.mobile{width:340px;height:500px}
+        .idc.mobile .idc-top{padding:14px 20px}
+        .idc.mobile .idc-body{flex-direction:column-reverse;align-items:stretch;gap:16px;padding:18px 20px 20px}
+        .idc.mobile .idc-photo{width:150px;align-self:center}
+        .idc.mobile .idc-photo-box{width:150px;height:190px}
+        .idc.mobile .idc-val.name{font-size:24px}
+        .idc.mobile .idc-fields{gap:12px}
+    </style>
+</head>
+<body class="bg-cosmic text-white relative" data-page="team">
+    <canvas id="starfield"></canvas>
+    <div id="site-header"></div>
+
+    <main class="relative z-10 pt-24 sm:pt-32 px-5 sm:px-6 lg:px-16 max-w-7xl mx-auto">
+
+        <section class="py-6 sm:py-10 reveal-up">
+            <div class="flex items-start gap-4 sm:gap-5 mb-8 sm:mb-10">
+                <div class="w-1.5 bg-mineblue rounded-none self-stretch flex-shrink-0"></div>
+                <div class="flex-grow">
+                    <div class="flex items-center gap-4 mb-3">
+                        <span class="text-xs font-bold text-mineblue tracking-widest uppercase">MINEVERSE TEAM</span>
+                        <div class="flex-grow h-[1px] bg-cardborder"></div>
+                        <span class="text-xs font-medium text-gray-400 uppercase tracking-widest">DIRECTORY</span>
+                    </div>
+                    <div class="flex flex-col md:flex-row justify-between md:items-end gap-4">
+                        <h1 class="font-extrabold text-3xl sm:text-5xl tracking-tight uppercase">Daftar Member Resmi</h1>
+                        <div class="relative w-full md:w-72">
+                            <svg class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z"/></svg>
+                            <input id="search" type="search" placeholder="Cari nama atau ID..." class="w-full bg-cardbg border border-cardborder rounded-lg pl-9 pr-4 py-2.5 text-sm font-medium text-white placeholder-gray-500 outline-none focus:border-mineblue transition-colors">
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-sm font-medium leading-relaxed mt-4 max-w-2xl">Jelajahi direktori arsip identitas kartu keanggotaan kolektif dan jajaran divisi komunitas global Mineverse. Klik member aktif untuk melihat ID card-nya.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- MEMBER AKTIF -->
+        <section class="mb-14">
+            <div class="flex items-center gap-3 mb-6 reveal-up">
+                <span class="px-5 py-2 rounded-lg bg-mineblue text-black text-xs font-extrabold uppercase tracking-wider">Member Aktif</span>
+                <span id="active-count" class="px-4 py-2 rounded-lg bg-cardbg border border-cardborder text-xs font-bold text-gray-400">0 Members</span>
+            </div>
+            <div id="active-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-6"></div>
+        </section>
+
+        <!-- MEMBER NONAKTIF -->
+        <section class="mb-10">
+            <div class="flex items-center gap-3 mb-6 reveal-up">
+                <span class="px-5 py-2 rounded-lg bg-cardbg border border-cardborder text-gray-300 text-xs font-extrabold uppercase tracking-wider">Member Nonaktif</span>
+                <span id="off-count" class="px-4 py-2 rounded-lg bg-cardbg border border-cardborder text-xs font-bold text-gray-400">0 Members</span>
+            </div>
+            <div id="off-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-6"></div>
+        </section>
+
+        <p id="empty" class="hidden text-center text-gray-400 text-sm font-medium py-16">Tidak ada member yang cocok.</p>
+    </main>
+
+    <div id="site-footer"></div>
+
+    <!-- ID CARD MODAL -->
+    <div id="idc-modal" role="dialog" aria-modal="true" aria-label="ID Card Member">
+        <div class="idc-stage">
+            <div class="idc-scale" id="idc-scale">
+                <div class="idc" id="idc"></div>
+            </div>
+            <div class="idc-ctrl">
+                <button class="idc-btn" id="idc-prev" aria-label="Sebelumnya">←</button>
+                <button class="idc-btn" id="idc-close">TUTUP ✕</button>
+                <button class="idc-btn" id="idc-next" aria-label="Berikutnya">→</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/members.js"></script>
+    <script src="js/layout.js"></script>
+    <script>
+        const PLACEHOLDER = "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 100"><rect width="80" height="100" fill="#15151b"/><circle cx="40" cy="38" r="15" fill="#2a2a36"/><path d="M10 100c2-26 16-36 30-36s28 10 30 36z" fill="#2a2a36"/></svg>');
+        window.imgErr = el => {
+            if (!el.dataset.f) { el.dataset.f = 1; el.src = 'iconmembers.png'; }
+            else { el.onerror = null; el.src = PLACEHOLDER; }
+        };
+        const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+        const photo = m => esc(m.img || `members/${m.name}.jpg`);
+        const dash = v => v && String(v).trim() ? esc(v) : '—';
+
+        const activeList = MEMBERS.filter(m => m.status === 'Aktif');
+        const offList = MEMBERS.filter(m => m.status !== 'Aktif');
+
+        function card(m, i, isActive) {
+            return `
+            <div class="member-card reveal-up bg-cardbg border border-cardborder rounded-lg p-3 card-hover-lift shadow-xl ${isActive ? '' : 'is-off'}" ${isActive ? `data-i="${i}" tabindex="0" role="button" aria-label="Buka ID card ${esc(m.name)}"` : ''}>
+                <div class="relative w-full aspect-[4/5] bg-cosmic border border-cardborder rounded-md overflow-hidden">
+                    ${isActive
+                        ? `<span class="absolute top-2.5 right-2.5 z-10 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-black/70 text-[10px] font-extrabold uppercase text-minegreen backdrop-blur"><span class="pulse-dot"></span>Active</span>`
+                        : `<span class="absolute top-2.5 right-2.5 z-10 px-2.5 py-1 rounded-md bg-black/70 text-[10px] font-extrabold uppercase text-gray-400 backdrop-blur">Nonaktif</span>`}
+                    <img src="${photo(m)}" alt="${esc(m.name)}" loading="lazy" class="member-img w-full h-full object-cover" onerror="imgErr(this)">
+                    <div class="absolute bottom-0 left-0 w-full h-3/5 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 w-full p-3 sm:p-4">
+                        <div class="font-extrabold text-sm sm:text-base leading-tight text-white">${esc(m.name)}</div>
+                        <div class="text-[10px] sm:text-xs font-bold uppercase tracking-wider ${isActive ? 'text-mineblue' : 'text-gray-500'}">${esc(m.id)}</div>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        let q = '';
+        let visibleActive = [];
+        function render() {
+            const k = q.trim().toLowerCase();
+            const hit = m => !k || (m.name + ' ' + m.id).toLowerCase().includes(k);
+            visibleActive = activeList.filter(hit);
+            const off = offList.filter(hit);
+            document.getElementById('active-grid').innerHTML = visibleActive.map((m, i) => card(m, i, true)).join('');
+            document.getElementById('off-grid').innerHTML = off.map((m, i) => card(m, i, false)).join('');
+            document.getElementById('active-count').textContent = visibleActive.length + ' Members';
+            document.getElementById('off-count').textContent = off.length + ' Members';
+            document.getElementById('empty').classList.toggle('hidden', visibleActive.length + off.length > 0);
+            document.querySelectorAll('#active-grid .member-card').forEach(c => {
+                c.addEventListener('click', () => openCard(+c.dataset.i));
+                c.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openCard(+c.dataset.i); } });
+            });
+            window.mvReveal();
+        }
+        document.getElementById('search').addEventListener('input', e => { q = e.target.value; render(); });
+
+        /* ---------- ID CARD ---------- */
+        const modal = document.getElementById('idc-modal');
+        const idc = document.getElementById('idc');
+        const wrap = document.getElementById('idc-scale');
+        let cur = 0;
+
+        function fitCard() {
+            const mob = window.innerWidth < 640;
+            const W = mob ? 340 : 720, H = mob ? 500 : 340;
+            idc.classList.toggle('mobile', mob);
+            const s = Math.min(1, (window.innerWidth - 32) / W, (window.innerHeight - 120) / H);
+            idc.style.transform = `scale(${s})`;
+            wrap.style.width = W * s + 'px';
+            wrap.style.height = H * s + 'px';
+        }
+
+        function fillCard(m) {
+            const ig = (m.ig || '').replace(/^@/, '').trim();
+            idc.innerHTML = `
+                <div class="idc-top">
+                    <div class="idc-brand">MINEVERSE</div>
+                    <div class="idc-title">Identity Card</div>
+                </div>
+                <div class="idc-body">
+                    <div class="idc-fields">
+                        <div><span class="idc-label">Nama</span><span class="idc-val name">${esc(m.name)}</span></div>
+                        <div class="idc-grid2">
+                            <div><span class="idc-label">Codename</span><span class="idc-val">${esc(m.id)}</span></div>
+                            <div><span class="idc-label">Aktif Sejak</span><span class="idc-val">${dash(m.since)}</span></div>
+                        </div>
+                        <div><span class="idc-label">Instagram</span><span class="idc-val">${ig ? `<a href="https://instagram.com/${encodeURIComponent(ig)}" target="_blank" rel="noopener">@${esc(ig)}</a>` : '—'}</span></div>
+                        <div><span class="idc-label">Status</span><span class="idc-status"><span class="pulse-dot"></span>ACTIVE</span></div>
+                    </div>
+                    <div class="idc-photo">
+                        <div class="idc-photo-box"><img src="${photo(m)}" alt="${esc(m.name)}" onerror="imgErr(this)"><i></i><i></i><i></i><i></i></div>
+                    </div>
+                </div>`;
+        }
+
+        function openCard(i) {
+            if (!visibleActive.length) return;
+            cur = (i + visibleActive.length) % visibleActive.length;
+            fillCard(visibleActive[cur]);
+            fitCard();
+            modal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeCard() { modal.classList.remove('open'); document.body.style.overflow = ''; }
+
+        document.getElementById('idc-close').onclick = closeCard;
+        document.getElementById('idc-prev').onclick = () => openCard(cur - 1);
+        document.getElementById('idc-next').onclick = () => openCard(cur + 1);
+        modal.addEventListener('click', e => { if (e.target === modal) closeCard(); });
+        document.addEventListener('keydown', e => {
+            if (!modal.classList.contains('open')) return;
+            if (e.key === 'Escape') closeCard();
+            if (e.key === 'ArrowLeft') openCard(cur - 1);
+            if (e.key === 'ArrowRight') openCard(cur + 1);
+        });
+        window.addEventListener('resize', fitCard);
+
+        render();
+    </script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artikel | Mineverse</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/tw-config.js"></script>
+    <link rel="stylesheet" href="css/site.css">
+</head>
+<body class="bg-cosmic text-white relative" data-page="blog">
+    <canvas id="starfield"></canvas>
+    <div id="site-header"></div>
+
+    <main class="relative z-10 pt-24 sm:pt-32 px-5 sm:px-6 lg:px-16 max-w-7xl mx-auto">
+        <article id="article" class="max-w-3xl mx-auto reveal-up"></article>
+
+        <section id="related-wrap" class="hidden mt-14 sm:mt-20 reveal-up">
+            <div class="flex items-center gap-4 mb-6">
+                <span class="text-xs font-bold text-mineblue tracking-widest uppercase">ARTIKEL LAINNYA</span>
+                <div class="flex-grow h-[1px] bg-cardborder"></div>
+            </div>
+            <div id="related" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+        </section>
+    </main>
+
+    <div id="site-footer"></div>
+
+    <script src="js/data.js"></script>
+    <script src="js/layout.js"></script>
+    <script>
+        const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+        const fmt = d => new Date(d + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+        const slug = new URLSearchParams(location.search).get('p');
+        const sorted = [...BLOG_POSTS].sort((a, b) => b.date.localeCompare(a.date));
+        const p = BLOG_POSTS.find(x => x.slug === slug);
+        const art = document.getElementById('article');
+
+        if (!p) {
+            art.innerHTML = `<a href="blog.html" class="text-xs font-bold text-mineblue uppercase tracking-wider">← Kembali ke Blog</a>
+                <h1 class="font-extrabold text-3xl mt-6 mb-3">Artikel tidak ditemukan</h1>
+                <p class="text-gray-400 text-sm font-medium">Link-nya mungkin salah atau artikelnya sudah dihapus.</p>`;
+        } else {
+            document.title = p.title + ' | Mineverse';
+            art.innerHTML = `
+                <a href="blog.html" class="inline-block text-xs font-bold text-mineblue hover:underline uppercase tracking-wider mb-8">← Kembali ke Blog</a>
+                <div class="flex items-center gap-2 text-xs font-bold mb-4 uppercase tracking-wider">
+                    <span class="text-mineblue font-extrabold">${esc(p.category)}</span><span class="text-gray-600">•</span><span class="text-gray-400">${fmt(p.date)}</span>
+                </div>
+                <h1 class="font-extrabold text-2xl sm:text-5xl tracking-tight leading-tight mb-5 sm:mb-6 break-words">${esc(p.title)}</h1>
+                <p class="text-xs text-gray-500 font-medium pb-6 mb-8 border-b border-cardborder">Ditulis oleh <span class="text-white font-bold">${esc(p.author)}</span></p>
+                <div class="h-48 sm:h-80 bg-cosmic border border-cardborder rounded-lg mb-10 overflow-hidden flex items-center justify-center">
+                    ${p.image ? `<img src="${esc(p.image)}" alt="" class="w-full h-full object-cover">` : `<span class="text-xs text-gray-600 font-bold uppercase">${esc(p.category)} Banner</span>`}
+                </div>
+                <div class="prose-mv">${p.content.map(c => /^\s*</.test(c) ? c : `<p>${c}</p>`).join('')}</div>
+                <div class="mt-12 pt-6 border-t border-cardborder">
+                    <a href="blog.html" class="inline-block px-5 py-2.5 rounded-lg bg-cardbg border border-cardborder text-xs font-bold text-mineblue hover:bg-mineblue hover:text-black hover:border-mineblue transition-all uppercase tracking-wider shine-effect">← Semua Artikel</a>
+                </div>`;
+
+            const rel = sorted.filter(x => x.slug !== p.slug).slice(0, 3);
+            if (rel.length) {
+                document.getElementById('related-wrap').classList.remove('hidden');
+                document.getElementById('related').innerHTML = rel.map(r => `
+                    <a href="post.html?p=${encodeURIComponent(r.slug)}" class="bg-cardbg border border-cardborder rounded-lg p-5 card-hover-lift group block shadow-xl">
+                        <div class="text-[11px] font-bold uppercase tracking-wider mb-2"><span class="text-mineblue">${esc(r.category)}</span> <span class="text-gray-500">• ${fmt(r.date)}</span></div>
+                        <h3 class="font-bold text-sm group-hover:text-mineblue transition-colors leading-snug">${esc(r.title)}</h3>
+                    </a>`).join('');
+            }
+        }
+        window.mvReveal();
+    </script>
+</body>
+</html>

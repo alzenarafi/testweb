@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mineverse Server | Branch</title>
+    
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cosmic: '#0b0b0d',
+                        cardbg: 'rgba(18, 18, 22, 0.80)',
+                        cardborder: '#22222c',
+                        mineblue: '#40c4ff',
+                        minered: '#b3122a',
+                        mineredsoft: 'rgba(179, 18, 42, 0.15)',
+                        mineyellow: '#ffa100',
+                        minegreen: '#2cd158',
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0b0b0d;
+            color: #ffffff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .glass-nav {
+            background: rgba(11, 11, 13, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid #22222c;
+        }
+
+        .bg-cardbg {
+            background-color: rgba(18, 18, 22, 0.80);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        /* CARD HOVER TANPA GLOW */
+        .card-hover-lift {
+            transition: transform 0.45s cubic-bezier(0.15, 0.85, 0.2, 1), border-color 0.3s ease;
+        }
+        .card-hover-lift:hover {
+            transform: translateY(-6px);
+            border-color: #b3122a;
+        }
+
+        .shine-effect {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shine-effect::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 30%;
+            height: 200%;
+            background: linear-gradient(
+                to right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.6) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: rotate(25deg);
+        }
+
+        .shine-effect:hover::after {
+            animation: manual-shine 0.75s ease-in-out forwards;
+        }
+
+        @keyframes manual-shine {
+            0% { left: -60%; }
+            100% { left: 130%; }
+        }
+
+        @keyframes slowPulse {
+            0% { opacity: 0.4; }
+            50% { opacity: 1; transform: scale(1.1); }
+            100% { opacity: 0.4; }
+        }
+
+        .status-dot-pulse {
+            animation: slowPulse 2s infinite ease-in-out;
+        }
+
+        .reveal-up {
+            opacity: 0;
+            transform: translateY(35px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal-up.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ---- Menu HP (hamburger) ---- */
+        html { scroll-padding-top: 84px; }
+        #mv-burger span { display: block; width: 22px; height: 2px; background: #fff; border-radius: 2px; transition: transform .3s, opacity .3s; }
+        #mv-burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        #mv-burger.open span:nth-child(2) { opacity: 0; }
+        #mv-burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+        #mv-menu { max-height: 0; overflow: hidden; visibility: hidden; transition: max-height .35s ease, visibility .35s; }
+        #mv-menu.open { max-height: 320px; visibility: visible; }
+        @media (max-width: 640px) {
+            main section h2 { overflow-wrap: anywhere; }
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0b0b0d; }
+        ::-webkit-scrollbar-thumb { background: #22222c; border-radius: 4px; border: 1px solid #b3122a; }
+    </style>
+</head>
+<body class="bg-cosmic text-white relative">
+
+    <canvas id="starfield"></canvas>
+
+    <!-- NAVBAR -->
+    <header class="fixed top-0 left-0 w-full z-50 glass-nav px-5 sm:px-6 lg:px-16 py-3 sm:py-4 flex items-center justify-between transition-all duration-300">
+        <a href="index.html" class="flex items-center gap-3">
+            <img src="logo.png" alt="Mineverse Logo" class="w-9 h-9 sm:w-10 sm:h-10 object-contain">
+            <span class="font-extrabold text-lg sm:text-xl tracking-wider text-white">MINEVERSE</span>
+        </a>
+
+        <nav class="hidden md:flex items-center gap-8 font-semibold text-sm tracking-wide text-gray-300">
+            <a href="index.html#home" class="hover:text-minered transition-colors">Home</a>
+            <a href="blog.html" class="hover:text-minered transition-colors">Blog</a>
+            <a href="team.html" class="hover:text-minered transition-colors">Team</a>
+            <a href="multiverse.html" class="hover:text-minered transition-colors text-minered font-bold">Multiverse</a>
+        </nav>
+
+        <button id="mv-burger" type="button" aria-label="Menu" aria-expanded="false" aria-controls="mv-menu" class="md:hidden flex flex-col gap-[5px] p-2.5 -mr-2.5"><span></span><span></span><span></span></button>
+        <div id="mv-menu" class="md:hidden absolute top-full left-0 w-full glass-nav">
+            <a href="index.html#home" class="block px-6 py-3.5 text-sm font-semibold tracking-wide border-t border-cardborder text-gray-300 hover:text-minered transition-colors">Home</a>
+            <a href="blog.html" class="block px-6 py-3.5 text-sm font-semibold tracking-wide border-t border-cardborder text-gray-300 hover:text-minered transition-colors">Blog</a>
+            <a href="team.html" class="block px-6 py-3.5 text-sm font-semibold tracking-wide border-t border-cardborder text-gray-300 hover:text-minered transition-colors">Team</a>
+            <a href="multiverse.html" class="block px-6 py-3.5 text-sm font-semibold tracking-wide border-t border-cardborder text-minered">Multiverse</a>
+        </div>
+    </header>
+
+    <main class="relative z-10 pt-24 sm:pt-28">
+
+        <!-- HERO SECTION -->
+        <section class="px-5 sm:px-6 lg:px-16 max-w-7xl mx-auto pt-8 pb-10">
+
+            <!-- Pill Badge Official Branch -->
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-cardbg border border-minered text-minered font-extrabold text-xs uppercase tracking-wider mb-6">
+                <svg class="w-4 h-4 text-minered" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+                <span>OFFICIAL BRANCH</span>
+            </div>
+
+            <!-- Hero Title -->
+            <h1 class="font-black text-[2.1rem] sm:text-6xl lg:text-7xl uppercase tracking-tight leading-none mb-6 text-white max-w-4xl">
+                MINEVERSE <span class="text-minered">SERVER</span>
+            </h1>
+
+            <!-- Hero Description -->
+            <p class="text-gray-400 text-base sm:text-lg max-w-3xl font-medium leading-relaxed mb-8">
+                Tempat seru buat main Minecraft bareng teman-teman secara online. Server kami siap diakses untuk pengguna versi Java maupun Bedrock.
+            </p>
+
+            <!-- Pill Info -->
+            <div class="flex flex-wrap items-center gap-3">
+                <!-- Pill Server Aktif -->
+                <div class="px-4 py-2.5 rounded-lg bg-cardbg border border-cardborder flex items-center gap-2.5 text-xs font-bold text-gray-200">
+                    <span class="w-2.5 h-2.5 rounded-full bg-minegreen inline-block"></span>
+                    <span>Server Aktif</span>
+                    <span class="text-gray-500 text-[11px] font-semibold">(1)</span>
+                </div>
+
+                <!-- Pill Server Selesai -->
+                <div class="px-4 py-2.5 rounded-lg bg-cardbg border border-cardborder flex items-center gap-2.5 text-xs font-bold text-gray-200">
+                    <span class="w-2.5 h-2.5 rounded-full bg-mineyellow inline-block"></span>
+                    <span>Server Selesai</span>
+                    <span class="text-gray-500 text-[11px] font-semibold">(4)</span>
+                </div>
+
+                <!-- Pill Total Server -->
+                <div class="px-4 py-2.5 rounded-lg bg-cardbg border border-cardborder flex items-center gap-2.5 text-xs font-bold text-gray-200">
+                    <span class="w-2.5 h-2.5 rounded-full bg-mineblue inline-block"></span>
+                    <span>Total Server: <strong class="text-white font-extrabold">5</strong></span>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- 1. SERVER AKTIF SECTION -->
+        <section id="active-servers" class="py-8 sm:py-12 px-5 sm:px-6 lg:px-16 max-w-7xl mx-auto reveal-up">
+            
+            <!-- Header Sector Baris -->
+            <div class="flex items-start gap-4 sm:gap-5 mb-8 sm:mb-10">
+                <div class="w-1.5 bg-minered rounded-none self-stretch flex-shrink-0"></div>
+                <div class="flex-grow">
+                    <div class="flex items-center gap-4 mb-3">
+                        <span class="text-xs font-bold text-minered tracking-widest uppercase">SECTOR 01</span>
+                        <div class="flex-grow h-[1px] bg-cardborder"></div>
+                        <span class="text-xs font-medium text-gray-400 uppercase tracking-widest">ONLINE</span>
+                    </div>
+                    <h2 class="font-extrabold text-3xl sm:text-5xl tracking-tight uppercase text-white">SERVER AKTIF</h2>
+                </div>
+            </div>
+
+            <!-- Grid Card Server Aktif (3 Kolom) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Active Card -->
+                <div class="bg-cardbg border border-cardborder rounded-lg p-6 card-hover-lift flex flex-col justify-between shadow-xl relative group">
+                    <div>
+                        <div class="flex items-start justify-between gap-4 mb-6">
+                            <div class="flex items-center gap-3">
+                                <img src="mineworld.png" alt="Mine SMP 0 Logo" class="w-12 h-12 rounded-lg object-contain bg-cosmic border border-cardborder p-1.5">
+                                <div>
+                                    <h3 class="font-extrabold text-lg text-white group-hover:text-minered transition-colors">Mine SMP 0</h3>
+                                    <span class="text-xs font-semibold text-mineblue">play.mineverse.my.id:24450</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-minegreen/10 border border-minegreen/20 text-minegreen text-[11px] font-extrabold uppercase flex-shrink-0 mt-0.5">
+                                <span class="w-2 h-2 rounded-full bg-minegreen status-dot-pulse"></span>
+                                <span>Aktif</span>
+                            </div>
+                        </div>
+
+                        <p class="text-gray-400 text-xs font-medium leading-relaxed mb-6">
+                            Sebuah server Minecraft Survival Public. Tempat bagi para pemain untuk bertahan hidup dan berpetualang bersama komunitas.
+                        </p>
+                    </div>
+
+                    <div>
+                        <div class="text-[11px] font-extrabold text-minered uppercase tracking-wider mb-4">JAVA &amp; BEDROCK</div>
+                        <div class="w-full h-[1px] bg-cardborder mb-4"></div>
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-gray-500 font-bold uppercase">PRODUCED BY</span>
+                            <span class="font-extrabold text-white">Reymazu</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. SERVER SELESAI / ARCHIVED SECTION -->
+        <section id="completed-servers" class="py-8 sm:py-12 px-5 sm:px-6 lg:px-16 max-w-7xl mx-auto reveal-up">
+            
+            <!-- Header Sector Baris -->
+            <div class="flex items-start gap-4 sm:gap-5 mb-8 sm:mb-10">
+                <div class="w-1.5 bg-gray-600 rounded-none self-stretch flex-shrink-0"></div>
+                <div class="flex-grow">
+                    <div class="flex items-center gap-4 mb-3">
+                        <span class="text-xs font-bold text-gray-500 tracking-widest uppercase">SECTOR 02</span>
+                        <div class="flex-grow h-[1px] bg-cardborder"></div>
+                        <span class="text-xs font-medium text-gray-500 uppercase tracking-widest">ARCHIVED</span>
+                    </div>
+                    <h2 class="font-extrabold text-3xl sm:text-5xl tracking-tight uppercase text-gray-300">SERVER SELESAI</h2>
+                </div>
+            </div>
+
+            <!-- Grid Card Server Selesai (Diubah Jadi 3 Kolom) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 opacity-85 hover:opacity-100 transition-opacity">
+                <!-- Offline Card 1 -->
+                <div class="bg-cardbg border border-cardborder rounded-lg p-6 card-hover-lift flex flex-col justify-between shadow-xl group">
+                    <div>
+                        <div class="flex items-start justify-between gap-3 mb-6">
+                            <div class="flex items-center gap-3">
+                                <img src="minepuasa.png" alt="Mine Puasa Logo" class="w-12 h-12 rounded-lg object-contain bg-cosmic border border-cardborder p-1.5 grayscale">
+                                <div>
+                                    <h3 class="font-extrabold text-base text-gray-200 group-hover:text-white transition-colors">Mine Puasa</h3>
+                                    <span class="text-xs font-semibold text-gray-500">2026</span>
+                                </div>
+                            </div>
+                            <span class="px-2.5 py-1 rounded-lg bg-gray-800 text-gray-400 border border-cardborder text-[10px] font-extrabold uppercase flex-shrink-0 mt-0.5">Offline</span>
+                        </div>
+
+                        <p class="text-gray-400 text-xs font-medium leading-relaxed mb-6">
+                            Server Minecraft yang aktif pada bulan Ramadhan. Kalian harus menahan lapar dan haus didalam server ini sampai waktu berbuka puasa tiba.
+                        </p>
+                    </div>
+
+                    <div>
+                        <div class="text-[11px] font-extrabold text-gray-500 uppercase tracking-wider mb-4">JAVA &amp; BEDROCK</div>
+                        <div class="w-full h-[1px] bg-cardborder mb-4"></div>
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-gray-500 font-bold uppercase">PRODUCED BY</span>
+                            <span class="font-bold text-gray-300">Reymazu</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Offline Card 2 -->
+                <div class="bg-cardbg border border-cardborder rounded-lg p-6 card-hover-lift flex flex-col justify-between shadow-xl group">
+                    <div>
+                        <div class="flex items-start justify-between gap-3 mb-6">
+                            <div class="flex items-center gap-3">
+                                <img src="minesmps12.png" alt="Mine SMP S1 Logo" class="w-12 h-12 rounded-lg object-contain bg-cosmic border border-cardborder p-1.5 grayscale">
+                                <div>
+                                    <h3 class="font-extrabold text-base text-gray-200 group-hover:text-white transition-colors">Mine SMP Season 1</h3>
+                                    <span class="text-xs font-semibold text-gray-500">2025</span>
+                                </div>
+                            </div>
+                            <span class="px-2.5 py-1 rounded-lg bg-gray-800 text-gray-400 border border-cardborder text-[10px] font-extrabold uppercase flex-shrink-0 mt-0.5">Offline</span>
+                        </div>
+
+                        <p class="text-gray-400 text-xs font-medium leading-relaxed mb-6">
+                            Sebuah server Minecraft Survival Private khusus Admineverse.
+                        </p>
+                    </div>
+
+                    <div>
+                        <div class="text-[11px] font-extrabold text-gray-500 uppercase tracking-wider mb-4">JAVA &amp; BEDROCK</div>
+                        <div class="w-full h-[1px] bg-cardborder mb-4"></div>
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-gray-500 font-bold uppercase">PRODUCED BY</span>
+                            <span class="font-bold text-gray-300">Alzena</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Offline Card 3 -->
+                <div class="bg-cardbg border border-cardborder rounded-lg p-6 card-hover-lift flex flex-col justify-between shadow-xl group">
+                    <div>
+                        <div class="flex items-start justify-between gap-3 mb-6">
+                            <div class="flex items-center gap-3">
+                                <img src="minesmps12.png" alt="Mine SMP S2 Logo" class="w-12 h-12 rounded-lg object-contain bg-cosmic border border-cardborder p-1.5 grayscale">
+                                <div>
+                                    <h3 class="font-extrabold text-base text-gray-200 group-hover:text-white transition-colors">Mine SMP Season 2</h3>
+                                    <span class="text-xs font-semibold text-gray-500">2025</span>
+                                </div>
+                            </div>
+                            <span class="px-2.5 py-1 rounded-lg bg-gray-800 text-gray-400 border border-cardborder text-[10px] font-extrabold uppercase flex-shrink-0 mt-0.5">Offline</span>
+                        </div>
+
+                        <p class="text-gray-400 text-xs font-medium leading-relaxed mb-6">
+                            Sebuah server Minecraft Survival Publik. Dimana terdapat sebuah cerita mengenai 4 Senjata Legenda tentang kiamat didalamnya.
+                        </p>
+                    </div>
+
+                    <div>
+                        <div class="text-[11px] font-extrabold text-gray-500 uppercase tracking-wider mb-4">JAVA &amp; BEDROCK</div>
+                        <div class="w-full h-[1px] bg-cardborder mb-4"></div>
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-gray-500 font-bold uppercase">PRODUCED BY</span>
+                            <span class="font-bold text-gray-300">Alzena</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Offline Card 4 -->
+                <div class="bg-cardbg border border-cardborder rounded-lg p-6 card-hover-lift flex flex-col justify-between shadow-xl group">
+                    <div>
+                        <div class="flex items-start justify-between gap-3 mb-6">
+                            <div class="flex items-center gap-3">
+                                <img src="minesmps3.png" alt="Mine SMP S3 Logo" class="w-12 h-12 rounded-lg object-contain bg-cosmic border border-cardborder p-1.5 grayscale">
+                                <div>
+                                    <h3 class="font-extrabold text-base text-gray-200 group-hover:text-white transition-colors">Mine SMP Season 3</h3>
+                                    <span class="text-xs font-semibold text-gray-500">2025-2026</span>
+                                </div>
+                            </div>
+                            <span class="px-2.5 py-1 rounded-lg bg-gray-800 text-gray-400 border border-cardborder text-[10px] font-extrabold uppercase flex-shrink-0 mt-0.5">Offline</span>
+                        </div>
+
+                        <p class="text-gray-400 text-xs font-medium leading-relaxed mb-6">
+                            Sebuah server Minecraft Survival Publik. Dimana kalian dapat menjelajahi lautan dan menjadi Raja Bajak Laut!
+                        </p>
+                    </div>
+
+                    <div>
+                        <div class="text-[11px] font-extrabold text-gray-500 uppercase tracking-wider mb-4">JAVA &amp; BEDROCK</div>
+                        <div class="w-full h-[1px] bg-cardborder mb-4"></div>
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-gray-500 font-bold uppercase">PRODUCED BY</span>
+                            <span class="font-bold text-gray-300">Alzena</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-cardborder bg-cardbg pt-12 sm:pt-16 pb-10 sm:pb-12 px-5 sm:px-6 lg:px-16 relative z-10 mt-12">
+        <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-5 gap-8 mb-10 sm:mb-16">
+            <div class="col-span-2 md:col-span-2">
+                <a href="index.html" class="flex items-center gap-3 mb-4">
+                    <img src="logo.png" alt="Mineverse Logo" class="w-8 h-8 object-contain">
+                    <span class="font-bold text-lg tracking-wider text-white">Mineverse</span>
+                </a>
+                <p class="text-xs text-gray-400 leading-relaxed font-medium pr-6">
+                    A next-generation digital Minecraft ecosystem infrastructure designed specifically for creative people who need a platform to create.
+                </p>
+            </div>
+            <div class="md:col-span-1">
+                <h4 class="font-bold text-xs uppercase tracking-wider text-white mb-4">SOCIAL MEDIA</h4>
+                <ul class="space-y-2 text-xs font-medium text-gray-400">
+                    <li><a href="https://www.youtube.com/@Mineverse.c" target="_blank" class="hover:text-minered transition-colors">YouTube</a></li>
+                    <li><a href="https://www.instagram.com/mineverse_official/" target="_blank" class="hover:text-minered transition-colors">Instagram</a></li>
+                    <li><a href="https://discord.gg/m8FVYTqZN" target="_blank" class="hover:text-minered transition-colors">Discord</a></li>
+                </ul>
+            </div>
+            <div class="md:col-span-1">
+                <h4 class="font-bold text-xs uppercase tracking-wider text-white mb-4">DOCUMENT</h4>
+                <ul class="space-y-2 text-xs font-medium text-gray-400">
+                    <li><a href="#" class="hover:text-minered transition-colors">Branding</a></li>
+                    <li><a href="index.html#about-sector" class="hover:text-minered transition-colors">Milestone</a></li>
+                    <li><a href="mailto:mineversepersonal@gmail.com" class="hover:text-minered transition-colors">Email</a></li>
+                </ul>
+            </div>
+            <div class="md:col-span-1">
+                <h4 class="font-bold text-xs uppercase tracking-wider text-white mb-4">SUPPORT</h4>
+                <ul class="space-y-2 text-xs font-medium text-gray-400">
+                    <li><a href="https://saweria.co/mineverseid" target="_blank" class="hover:text-minered transition-colors">Saweria</a></li>
+                    <li><a href="index.html#about-sector" class="hover:text-minered transition-colors">Partnership</a></li>
+                    <li><a href="index.html#about-sector" class="hover:text-minered transition-colors">Proposal</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto pt-8 border-t border-cardborder flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-gray-500 font-medium">
+            <div>&copy; 2026 Mineverse Portal. All Rights Reserved.</div>
+            <div class="flex items-center gap-2 text-gray-400">
+                <span class="w-2 h-2 rounded-full bg-minered inline-block"></span>
+                <span>Alzena - Owner &amp; Founder Mineverse</span>
+                <span class="w-2 h-2 rounded-full bg-minered inline-block"></span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- BACKGROUND ANIMATED STARFIELD -->
+    <script>
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+
+        let stars = [];
+        const numStars = 140;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        for (let i = 0; i < numStars; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 1.2 + 0.3,
+                alpha: Math.random() * 0.6 + 0.2,
+                vx: (Math.random() - 0.5) * 0.3,
+                vy: (Math.random() - 0.5) * 0.3
+            });
+        }
+
+        function animateStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#ffffff';
+
+            stars.forEach(star => {
+                star.x += star.vx;
+                star.y += star.vy;
+
+                if (star.x < 0) star.x = canvas.width;
+                if (star.x > canvas.width) star.x = 0;
+                if (star.y < 0) star.y = canvas.height;
+                if (star.y > canvas.height) star.y = 0;
+
+                ctx.globalAlpha = star.alpha;
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            requestAnimationFrame(animateStars);
+        }
+        animateStars();
+
+        (function () {
+            const bt = document.getElementById('mv-burger'), mn = document.getElementById('mv-menu');
+            const set = o => { bt.classList.toggle('open', o); mn.classList.toggle('open', o); bt.setAttribute('aria-expanded', o); };
+            bt.onclick = e => { e.stopPropagation(); set(!mn.classList.contains('open')); };
+            mn.querySelectorAll('a').forEach(a => a.addEventListener('click', () => set(false)));
+            document.addEventListener('click', e => { if (!mn.contains(e.target)) set(false); });
+            addEventListener('keydown', e => { if (e.key === 'Escape') set(false); });
+            addEventListener('resize', () => { if (innerWidth >= 768) set(false); });
+        })();
+
+        const revealElements = document.querySelectorAll('.reveal-up');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        revealElements.forEach(el => observer.observe(el));
+    </script>
+</body>
+</html>
